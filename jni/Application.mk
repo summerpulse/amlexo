@@ -1,0 +1,4 @@
+APP_STL := gnustl_static
+APP_PLATFORM := android-19
+APP_ABI := $(ANDROID_ABI)
+NDK_TOOLCHAIN_VERSION=4.6

@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.meson.videoplayer2"
+    android:versionCode="1" 
+    android:versionName="1.0">
+
+    <supports-screens android:largeScreens="true" android:anyDensity="true"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
+   
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.CHANGE_CONFIGURATION" />
+    <uses-permission android:name="android.permission.GET_TASKS" />
+    <uses-permission android:name="android.permission.SET_ANIMATION_SCALE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/> 
+    
+    <application android:icon="@drawable/icon" android:label="@string/app_name">
+
+        <activity android:name="com.meson.videoplayer2.FileList2"
+            android:theme="@style/theme_trans"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+    <activity android:name="com.mediacodec.demo.simple.SimplePlayerActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:label="@string/application_name" android:theme="@style/PlayerTheme" android:enabled="true"/>
+    <activity android:name="com.mediacodec.demo.full.FullPlayerActivity"
+        android:configChanges="keyboardHidden|orientation|screenSize"
+        android:label="@string/application_name"
+        android:theme="@style/PlayerTheme">
+    </activity><activity android:name="com.mediacodec.demo.SampleChooserActivity" android:configChanges="keyboardHidden" android:label="@string/application_name">
+    </activity>
+    </application>
+
+</manifest> 
