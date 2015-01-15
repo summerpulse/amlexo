@@ -586,7 +586,7 @@ static jboolean FFmpegExtractor_hasCacheReachedEndOfStream (JNIEnv *env, jobject
 
 static void FFmpegExtractor_native_init (JNIEnv *env, jobject object)
 {
-    jclass clazz = env->FindClass("meson/media/demux/FFExtractor");
+    jclass clazz = env->FindClass("com/google/android/exoplayer/FFExtractor");
     if (clazz == NULL)
         return;
 
@@ -655,9 +655,9 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
         LOGE("ERROR: GetEnv failed\n");
     } else {
         jversion = JNI_VERSION_1_4;
-        clazz = env->FindClass("meson/media/demux/FFExtractor");
+        clazz = env->FindClass("com/google/android/exoplayer/FFExtractor");
         if (clazz == NULL) {
-            LOGE("ERROR: FindClass meson/media/demux/FFExtractor.\n");
+            LOGE("ERROR: FindClass com/google/android/exoplayer/FFExtractor.\n");
             return -1;
         }
         result = env->RegisterNatives(clazz,
@@ -678,7 +678,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved)
     if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {
         LOGE("ERROR: GetEnv failed\n");
     } else {
-        clazz = env->FindClass("meson/media/demux/FFExtractor");
+        clazz = env->FindClass("com/google/android/exoplayer/FFExtractor");
         if (clazz != NULL)
             env->UnregisterNatives(clazz);
     }

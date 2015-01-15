@@ -26,7 +26,7 @@ extern "C"
 #include <utils/List.h>
 
 namespace android {
-
+class PTSPopulator;
 class FFDemux {
 public:
     enum TrackFlags {
@@ -107,16 +107,23 @@ private:
     std::vector<TrackInfo> mTracks;
 
     AVFormatContext *mFormatContext;
+    PTSPopulator* mPTSPopulator;
+
     AVPacket mPkt;
     int currentTrack;
     int videoIndex;
     int audioIndex;
     int subtitleIndex;
     int64_t mSampleTimeUs;
+    int64_t mStartTimeUs;
 
     AVFormatContext* openAVFormatContext(FFIO *fio);
     Mutex mLock;
     int mStatus;
+
+    int64_t convertTimeBaseToMicroSec(int64_t time);
+    int64_t convertMicroSecToTimeBase(int64_t time);
+    int64_t convertStreamTimeToUs(AVStream *st, int64_t timeInStreamTime);
 };
 
 }
