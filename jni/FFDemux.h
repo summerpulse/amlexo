@@ -70,6 +70,7 @@ public:
         int mTrackIndex;
         int mTrackType; /* 0 video. 1 audio. 2 subtitle. */
         int mSeleted;
+        int mExtraPushed;
         uint32_t mTrackFlags;  // bitmask of "TrackFlags"
         std::string mime;
         struct VideoParam video;
@@ -117,13 +118,13 @@ private:
     int64_t mSampleTimeUs;
     int64_t mStartTimeUs;
 
-    AVFormatContext* openAVFormatContext(FFIO *fio);
     Mutex mLock;
     int mStatus;
 
     int64_t convertTimeBaseToMicroSec(int64_t time);
     int64_t convertMicroSecToTimeBase(int64_t time);
     int64_t convertStreamTimeToUs(AVStream *st, int64_t timeInStreamTime);
+    AVFormatContext* openAVFormatContext(FFIO *fio);
 };
 
 }

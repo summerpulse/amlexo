@@ -43,7 +43,7 @@ import com.mediacodec.demo.simple.SimplePlayerActivity;
 public class FileList2 extends ListActivity {
 	private static final String ROOT_PATH = "/storage";
 	private static final String SHEILD_EXT_STOR = "/storage/sdcard0/external_storage";
-	private static final String NAND_PATH = "/data/usb";
+	private static final String NAND_PATH = "/storage/sdcard0";//"/data/usb";
 	private static final String SD_PATH = "/storage/external_storage/sdcard1";
 	private static final String USB_PATH = "/storage/external_storage";
 

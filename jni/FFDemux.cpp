@@ -171,6 +171,7 @@ status_t FFDemux::post_init()
 						str, st->codec->width, st->codec->height);
 		mTracks[videoIndex].mSeleted = 0;
 		mTracks[videoIndex].mTrackType = 0;
+		mTracks[videoIndex].mExtraPushed = 0;
 		mTracks[videoIndex].mime = str;
 		mTracks[videoIndex].video.width = st->codec->width;
 		mTracks[videoIndex].video.height = st->codec->height;
@@ -189,6 +190,7 @@ status_t FFDemux::post_init()
 					st->codec->channels);
 		mTracks[audioIndex].mSeleted = 0;
 		mTracks[audioIndex].mTrackType = 1;
+		mTracks[audioIndex].mExtraPushed = 0;
 		mTracks[audioIndex].mime = str;
 		mTracks[audioIndex].audio.sampleRate = st->codec->sample_rate;
 		mTracks[audioIndex].audio.channels = st->codec->channels;
@@ -204,6 +206,7 @@ status_t FFDemux::post_init()
 		} else
 			LOGV("Subtitle: %s found.\n", str);
 		mTracks[subtitleIndex].mSeleted = 0;
+		mTracks[subtitleIndex].mExtraPushed = 0;
 		mTracks[subtitleIndex].mTrackType = 2;
 		mTracks[subtitleIndex].mime = str;
 		mTracks[subtitleIndex].subtitle.lang = "eng";
@@ -212,6 +215,7 @@ status_t FFDemux::post_init()
     mPTSPopulator = new PTSPopulator(mTracks.size());
     if (static_cast<int64_t>(AV_NOPTS_VALUE) !=  mFormatContext->start_time)
     	mStartTimeUs = mFormatContext->start_time;
+
 
     ret = 0;
 exit:
@@ -393,14 +397,33 @@ status_t FFDemux::readSampleData(char* buf, size_t& len, int offset)
 		len = 0;
 		return -1;
 	}
-	if (mPkt.size == 0) {
-		len = 0;
+	if (currentTrack < 0 || currentTrack > 2)
+		return -1;
+
+	if (mTracks[currentTrack].mExtraPushed) {
+		if (mPkt.size == 0) {
+			len = 0;
+		} else {
+			int destLen = (len - offset) > mPkt.size ? mPkt.size : (len - offset);
+			memcpy((buf + offset), mPkt.data, destLen);
+			len = destLen;
+		}
 	} else {
-		int destLen = (len - offset) > mPkt.size ? mPkt.size : (len - offset);
-		memcpy((buf + offset), mPkt.data, destLen);
-		len = destLen;
+		AVCodecContext* codec;
+		int trackIndex = mTracks[currentTrack].mTrackIndex;
+
+		codec = mFormatContext->streams[trackIndex]->codec;
+		if (codec->extradata_size > 0) {
+			int destLen = (len - offset) > codec->extradata_size ?
+								codec->extradata_size : (len - offset);
+			memcpy((buf + offset), codec->extradata, destLen);
+			len = destLen;
+		} else {
+			len = 0;
+		}
+		mTracks[currentTrack].mExtraPushed = 1;
 	}
-    return 0;
+    return -1;
 }
 
 status_t FFDemux::getSampleTrackIndex(size_t *trackIndex)
