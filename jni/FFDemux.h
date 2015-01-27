@@ -27,6 +27,7 @@ extern "C"
 
 namespace android {
 class PTSPopulator;
+class StreamFormats;
 class FFDemux {
 public:
     enum TrackFlags {
@@ -71,11 +72,15 @@ public:
         int mTrackType; /* 0 video. 1 audio. 2 subtitle. */
         int mSeleted;
         int mExtraPushed;
+        std::vector<AVPacket*> mPacketQueue;
         uint32_t mTrackFlags;  // bitmask of "TrackFlags"
         std::string mime;
         struct VideoParam video;
         struct AudioParam audio;
         struct SubtitleParam subtitle;
+        int mExtraSize;
+        uint8_t* mExtraData;
+        StreamFormats* mFormat;
     };
 
     FFDemux();
@@ -110,11 +115,13 @@ private:
     AVFormatContext *mFormatContext;
     PTSPopulator* mPTSPopulator;
 
-    AVPacket mPkt;
     int currentTrack;
     int videoIndex;
     int audioIndex;
     int subtitleIndex;
+    int videoStreamIndex;
+    int audioStreamIndex;
+    int subtitleStreamIndex;
     int64_t mSampleTimeUs;
     int64_t mStartTimeUs;
 
@@ -125,6 +132,8 @@ private:
     int64_t convertMicroSecToTimeBase(int64_t time);
     int64_t convertStreamTimeToUs(AVStream *st, int64_t timeInStreamTime);
     AVFormatContext* openAVFormatContext(FFIO *fio);
+    int select_current_track();
+    StreamFormats* selectFormat(enum AVCodecID codecid);
 };
 
 }

@@ -103,7 +103,6 @@ int32_t FFIO::read(uint8_t* buf, int read_size)
     ssize_t result = 0;
     uint64_t pos = mNextReadPos;
 
-    LOGV("readAt pos %lld read_size %d", pos, read_size);
     result = mSource->readAt(pos, buf, read_size);
     if (result > 0) {
         mNextReadPos += result;

@@ -10,7 +10,11 @@ LOCAL_SRC_FILES := ExoPlayerLibJNI.cpp \
 			FFDemux.cpp \
 			DataSource.cpp \
 			PTSPopulator.cpp \
-			mediainfo_def.cpp
+			mediainfo_def.cpp \
+			utils/utils.cpp \
+			formats/StreamFormats.cpp \
+			formats/AVCFormat.cpp
+
 
 PRIVATE_LIBDIR=$(LOCAL_PATH)/android-libs
 

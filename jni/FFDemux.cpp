@@ -10,6 +10,7 @@
 #include "mediainfo_def.h"
 #include "PTSPopulator.h"
 #include "utils/log2.h"
+#include "formats/AVCFormat.h"
 
 #include <stdint.h>
 
@@ -48,6 +49,9 @@ FFDemux::FFDemux()
         videoIndex(-1),
         audioIndex(-1),
         subtitleIndex(-1),
+        videoStreamIndex(-1),
+        audioStreamIndex(-1),
+        subtitleStreamIndex(-1),
         mStatus(0),
         currentTrack(-1),
         mSampleTimeUs(0),
@@ -55,10 +59,7 @@ FFDemux::FFDemux()
         mStartTimeUs(0)
 {
     // TODO Auto-generated constructor stub
-    /* initialize av package structure. */
-    av_init_packet(&mPkt);
-    mPkt.data = NULL;
-    mPkt.size = 0;
+
 }
 
 FFDemux::~FFDemux() 
@@ -71,7 +72,6 @@ FFDemux::~FFDemux()
     if (src)
         delete src;
     mTracks.clear();
-    av_free_packet(&mPkt);
 }
 
 AVFormatContext* FFDemux::openAVFormatContext(FFIO *fio)
@@ -105,12 +105,22 @@ AVFormatContext* FFDemux::openAVFormatContext(FFIO *fio)
     return context;
 }
 
+StreamFormats* FFDemux::selectFormat(enum AVCodecID codecid)
+{
+	if (codecid == AV_CODEC_ID_H264)
+		return new AVCFormat();
+	else if (codecid == AV_CODEC_ID_AAC)
+		return new StreamFormats();
+	return new StreamFormats();
+}
+
 status_t FFDemux::post_init()
 {
     status_t ret = -1;
     const char* str;
     MediaMimeItem mmt;
     AVStream *st;
+    AVCodecContext* codec;
     TrackInfo trackinfo;
 
     mFormatContext = openAVFormatContext(&ffio);
@@ -162,6 +172,7 @@ status_t FFDemux::post_init()
     /* set mime for video. */
     if (videoIndex >= 0) {
 		st = mFormatContext->streams[mTracks[videoIndex].mTrackIndex];
+		codec = st->codec;
 		str = convertCodecIdToMimeType(st->codec->codec_id);
 		if (str == NULL) {
 			LOGV("Doesn't support video type %x\n", st->codec->codec_id);
@@ -175,11 +186,17 @@ status_t FFDemux::post_init()
 		mTracks[videoIndex].mime = str;
 		mTracks[videoIndex].video.width = st->codec->width;
 		mTracks[videoIndex].video.height = st->codec->height;
+		mTracks[videoIndex].mPacketQueue.clear();
+		mTracks[videoIndex].mFormat = selectFormat(codec->codec_id);
+		mTracks[videoIndex].mFormat->formatCodecMeta(codec);
+		mTracks[videoIndex].mExtraData = mTracks[videoIndex].mFormat->mcodecMeta;
+		mTracks[videoIndex].mExtraSize = mTracks[videoIndex].mFormat->mCodecMetaSize;
     }
 
     /* set mime for audio. */
     if (audioIndex >= 0) {
 		st = mFormatContext->streams[mTracks[audioIndex].mTrackIndex];
+		codec = st->codec;
 		str = convertCodecIdToMimeType(st->codec->codec_id);
 		if (str == NULL) {
 			LOGV("Doesn't support audio type %x\n", st->codec->codec_id);
@@ -194,11 +211,18 @@ status_t FFDemux::post_init()
 		mTracks[audioIndex].mime = str;
 		mTracks[audioIndex].audio.sampleRate = st->codec->sample_rate;
 		mTracks[audioIndex].audio.channels = st->codec->channels;
+		mTracks[audioIndex].mPacketQueue.clear();
+		mTracks[audioIndex].mFormat = selectFormat(codec->codec_id);
+		mTracks[audioIndex].mFormat->formatCodecMeta(codec);
+		mTracks[audioIndex].mExtraData = mTracks[audioIndex].mFormat->mcodecMeta;
+		mTracks[audioIndex].mExtraSize = mTracks[audioIndex].mFormat->mCodecMetaSize;
+
     }
 
     /* set parameter for subtitle. */
     if (subtitleIndex >= 0) {
 		st = mFormatContext->streams[mTracks[subtitleIndex].mTrackIndex];
+		codec = st->codec;
 		str = convertCodecIdToMimeType(st->codec->codec_id);
 		if (str == NULL) {
 			LOGV("Doesn't support subtitle type %x\n", st->codec->codec_id);
@@ -206,16 +230,20 @@ status_t FFDemux::post_init()
 		} else
 			LOGV("Subtitle: %s found.\n", str);
 		mTracks[subtitleIndex].mSeleted = 0;
-		mTracks[subtitleIndex].mExtraPushed = 0;
+		mTracks[subtitleIndex].mExtraPushed = 2;
 		mTracks[subtitleIndex].mTrackType = 2;
 		mTracks[subtitleIndex].mime = str;
 		mTracks[subtitleIndex].subtitle.lang = "eng";
+		mTracks[subtitleIndex].mPacketQueue.clear();
+		mTracks[subtitleIndex].mFormat = selectFormat(codec->codec_id);
+		mTracks[subtitleIndex].mFormat->formatCodecMeta(codec);
+		mTracks[subtitleIndex].mExtraData = mTracks[subtitleIndex].mFormat->mcodecMeta;
+		mTracks[subtitleIndex].mExtraSize = mTracks[subtitleIndex].mFormat->mCodecMetaSize;
     }
 
     mPTSPopulator = new PTSPopulator(mTracks.size());
     if (static_cast<int64_t>(AV_NOPTS_VALUE) !=  mFormatContext->start_time)
     	mStartTimeUs = mFormatContext->start_time;
-
 
     ret = 0;
 exit:
@@ -283,6 +311,12 @@ status_t FFDemux::selectTrack(size_t index)
         return -1;
 
     mTracks[index].mSeleted = 1;
+    if (index == videoIndex)
+    	videoStreamIndex = mTracks[index].mTrackIndex;
+    if (index == audioIndex)
+    	audioStreamIndex = mTracks[index].mTrackIndex;
+    if (index == subtitleIndex)
+    	subtitleStreamIndex = mTracks[index].mTrackIndex;
     return 0;
 }
 
@@ -295,6 +329,12 @@ status_t FFDemux::unselectTrack(size_t index)
         return -1;
 
     mTracks[index].mSeleted = 0;
+    if (index == videoIndex)
+    	videoStreamIndex = -1;
+    if (index == audioIndex)
+    	audioStreamIndex = -1;
+    if (index == subtitleIndex)
+    	subtitleStreamIndex = -1;
     return 0;
 }
 
@@ -352,78 +392,138 @@ status_t FFDemux::advance()
     int i;
     int ret = 0;
     int search_end = 0;
+    AVPacket *packet = new AVPacket();
+
     Mutex::Autolock autoLock(mLock);
     do {
-    	mStatus = av_read_frame(mFormatContext, &mPkt);
+    	mStatus = av_read_frame(mFormatContext, packet);
         if (mStatus < 0 || avio_feof(mFormatContext->pb)) {
         	currentTrack = -1;
+        	LOGE("[ERROR]av_read_frame:%s.\n", av_err2str(mStatus));
+        	delete packet;
             return mStatus;
         }
-        if (mPkt.size > 0) {
-            for(i = 0; i < mTracks.size() && !search_end; i++) {
-                if (mTracks[i].mTrackIndex == mPkt.stream_index &&
-                					mTracks[i].mSeleted) {
-                    search_end = 1;
-                }
-            }
+        if (packet->size == 0) {
+        	av_free_packet(packet);
+        	continue;
         }
-        if (search_end) {
-            const bool isKeyFrame = (mPkt.flags & AV_PKT_FLAG_KEY) != 0;
-            AVStream *st = mFormatContext->streams[mPkt.stream_index];
-            const int64_t ptsFromFFmpeg =
-                    (mPkt.pts == static_cast<int64_t>(AV_NOPTS_VALUE))
-                    ? kUnknownPTS : convertStreamTimeToUs(st, mPkt.pts);
-            const int64_t dtsFromFFmpeg =
-                    (mPkt.dts == static_cast<int64_t>(AV_NOPTS_VALUE))
-                    ? kUnknownPTS : convertStreamTimeToUs(st, mPkt.dts);
-            const int64_t predictedPTSInUs = mPTSPopulator->computePTS(
-            		mPkt.stream_index, ptsFromFFmpeg, dtsFromFFmpeg, isKeyFrame);
-            const int64_t normalizedPTSInUs = (predictedPTSInUs == kUnknownPTS)?
-                    dtsFromFFmpeg - mStartTimeUs : ((predictedPTSInUs - mStartTimeUs < 0
-                    && predictedPTSInUs - mStartTimeUs > -10) ? 0 : predictedPTSInUs - mStartTimeUs); // starttime may exceed pts a little in some ugly streams.
 
-			currentTrack = i;
-			mSampleTimeUs = normalizedPTSInUs;
+        if (packet->stream_index == videoStreamIndex) {
+        	av_dup_packet(packet);
+        	mTracks[videoIndex].mPacketQueue.push_back(packet);
+        } else if(packet->stream_index == audioStreamIndex) {
+        	av_dup_packet(packet);
+        	mTracks[audioIndex].mPacketQueue.push_back(packet);
+        } else if(packet->stream_index == subtitleStreamIndex) {
+        	av_dup_packet(packet);
+        	mTracks[subtitleIndex].mPacketQueue.push_back(packet);
+        } else {
+        	av_free_packet(packet);
+        	continue;
         }
-    } while (!search_end);
+        break;
+    } while (true);
     return 0;
+}
+
+int FFDemux::select_current_track()
+{
+	/* return the extra data first. */
+	if (videoStreamIndex >= 0 && mTracks[videoIndex].mExtraPushed == 0)
+		return videoIndex;
+	else if (audioStreamIndex >= 0 && mTracks[audioIndex].mExtraPushed == 0)
+		return audioIndex;
+	else if (subtitleStreamIndex >= 0 && mTracks[subtitleIndex].mExtraPushed == 0)
+		return subtitleIndex;
+
+	/* just select a non empty buffer to pop. */
+	if (videoStreamIndex >= 0 && mTracks[videoIndex].mPacketQueue.size() > 0)
+		return videoIndex;
+	else if (audioStreamIndex >= 0 && mTracks[audioIndex].mPacketQueue.size() > 0)
+		return audioIndex;
+	else if (subtitleStreamIndex >= 0 && mTracks[subtitleIndex].mPacketQueue.size() > 0)
+		return subtitleIndex;
+	return -1;
 }
 
 status_t FFDemux::readSampleData(char* buf, size_t& len, int offset)
 {
 	Mutex::Autolock autoLock(mLock);
-	if (offset > len || mStatus < 0) {
-		LOGE("[X]off:%d size:%d %x\n", offset, len, mStatus);
+	if (offset > len) {
+		len = 0;
+		LOGE("[X]Offset:%d exeeding:%d.\n", offset, len);
+		return -1;
+	}
+	if (mStatus < 0) {
 		len = 0;
 		return -1;
 	}
-	if (currentTrack < 0 || currentTrack > 2)
-		return -1;
+
+	currentTrack = select_current_track();
+	if (currentTrack < 0 || currentTrack > 2) {
+		len = 0;
+		return 0;
+	}
 
 	if (mTracks[currentTrack].mExtraPushed) {
-		if (mPkt.size == 0) {
-			len = 0;
-		} else {
-			int destLen = (len - offset) > mPkt.size ? mPkt.size : (len - offset);
-			memcpy((buf + offset), mPkt.data, destLen);
-			len = destLen;
-		}
-	} else {
-		AVCodecContext* codec;
-		int trackIndex = mTracks[currentTrack].mTrackIndex;
+		StreamFormats* formater;
+		AVPacket *packet;
+		int newPacketLen;
+		int destLen;
 
-		codec = mFormatContext->streams[trackIndex]->codec;
-		if (codec->extradata_size > 0) {
-			int destLen = (len - offset) > codec->extradata_size ?
-								codec->extradata_size : (len - offset);
-			memcpy((buf + offset), codec->extradata, destLen);
+		if (mTracks[currentTrack].mPacketQueue.size() == 0) {
+			len = 0;
+			return 0;
+		}
+
+		packet = mTracks[currentTrack].mPacketQueue[0];
+		mTracks[currentTrack].mPacketQueue.erase(mTracks[currentTrack].mPacketQueue.begin());
+		formater = mTracks[currentTrack].mFormat;
+		if (packet == NULL) {
+			len = 0;
+			return 0;
+		}
+
+		newPacketLen = formater->getPackageSize(packet->data, packet->size);
+		destLen = (len - offset) > newPacketLen ?newPacketLen : (len - offset);
+		formater->formatPackage((uint8_t*)packet->data, packet->size,
+						(uint8_t*)(buf + offset), destLen);
+		len = destLen;
+        if ((packet->stream_index == videoStreamIndex) ||
+        		(packet->stream_index == audioStreamIndex) ||
+        		(packet->stream_index == subtitleStreamIndex)) {
+            const bool isKeyFrame = (packet->flags & AV_PKT_FLAG_KEY) != 0;
+            AVStream *st = mFormatContext->streams[packet->stream_index];
+            const int64_t ptsFromFFmpeg =
+                    (packet->pts == static_cast<int64_t>(AV_NOPTS_VALUE))
+                    ? kUnknownPTS : convertStreamTimeToUs(st, packet->pts);
+            const int64_t dtsFromFFmpeg =
+                    (packet->dts == static_cast<int64_t>(AV_NOPTS_VALUE))
+                    ? kUnknownPTS : convertStreamTimeToUs(st, packet->dts);
+            const int64_t predictedPTSInUs = mPTSPopulator->computePTS(
+            		packet->stream_index, ptsFromFFmpeg, dtsFromFFmpeg, isKeyFrame);
+            const int64_t normalizedPTSInUs = (predictedPTSInUs == kUnknownPTS)?
+                    dtsFromFFmpeg - mStartTimeUs : ((predictedPTSInUs - mStartTimeUs < 0
+                    && predictedPTSInUs - mStartTimeUs > -10) ? 0 : predictedPTSInUs - mStartTimeUs); // starttime may exceed pts a little in some ugly streams.
+
+			mSampleTimeUs = normalizedPTSInUs;
+        }
+        av_free_packet(packet);
+        delete packet;
+	} else {
+		uint8_t* extra = mTracks[0].mFormat->mcodecMeta;
+		int extraLen = mTracks[0].mFormat->mCodecMetaSize;
+		if (extraLen > 0) {
+			int destLen = (len - offset) >extraLen ?
+					extraLen : (len - offset);
+			memcpy((buf + offset), extra, destLen);
 			len = destLen;
 		} else {
 			len = 0;
 		}
 		mTracks[currentTrack].mExtraPushed = 1;
 	}
-    return -1;
+    return 0;
 }
 
 status_t FFDemux::getSampleTrackIndex(size_t *trackIndex)

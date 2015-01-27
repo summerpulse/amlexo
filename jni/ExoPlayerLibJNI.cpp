@@ -90,7 +90,7 @@ int jniGetFDFromFileDescriptor(JNIEnv* env, jobject fileDescriptor) {
 class JFfmpegExtractor {
 public:
     JFfmpegExtractor(JNIEnv *env, jobject thiz);
-    ~JFfmpegExtractor();
+    void JFfmpegRlease(JNIEnv *env);
 
     void setDataSource (jobject source);
     void setDataSource (char* path);
@@ -98,12 +98,12 @@ public:
 
     int getTrackCount ();
     status_t getTrackFormatHash (jint index, jobject* format);
-    status_t getTrackFormat (jint index, jobject* format);
+    status_t getTrackFormat (JNIEnv *env, jint index, jobject* format);
     jobject selectTrack (jint index);
     void unselectTrack (jint index);
     void seekTo (jlong timeUs, jint mode);
     jboolean advance ();
-    jint readSampleData (jobject byteBuf, jint offset, size_t *sampleSize);
+    jint readSampleData (JNIEnv *env, jobject byteBuf, jint offset, size_t *sampleSize);
     int getSampleTrackIndex ();
     jlong getSampleTime ();
     jint getSampleFlags ();
@@ -111,55 +111,31 @@ public:
     jboolean hasCacheReachedEndOfStream ();
 
 private:
+    jobject makeByteBufferObject(JNIEnv *env, const void *data, size_t size);
     jclass mClass;
     jweak mObject;
-    JNIEnv *mEnv;
     FFDemux* mImpl;
 };
 
-static jobject makeIntegerObject(JNIEnv *env, int32_t value) {
-    jclass clazz= env->FindClass("java/lang/Integer");
-    if (clazz == NULL)
-        return NULL;
-
-    jmethodID integerConstructID =
-        env->GetMethodID(clazz, "<init>", "(I)V");
-    CHECK(integerConstructID != NULL);
-    return env->NewObject(clazz, integerConstructID, value);
-}
-
-static jobject makeLongObject(JNIEnv *env, int64_t value) {
-    jclass clazz= env->FindClass("java/lang/Long");
-    if (clazz == NULL)
-        return NULL;
-
-    jmethodID longConstructID = env->GetMethodID(clazz, "<init>", "(J)V");
-    CHECK(longConstructID != NULL);
-
-    return env->NewObject(clazz, longConstructID, value);
-}
-
 JFfmpegExtractor::JFfmpegExtractor(JNIEnv *env, jobject thiz)
-    : mEnv(NULL),
-      mClass(NULL),
+      :mClass(NULL),
       mObject(NULL)
 {
-    mEnv = env;
-    jclass clazz = mEnv->GetObjectClass(thiz);
+    jclass clazz = env->GetObjectClass(thiz);
     if (clazz == NULL)
         return;
 
-    mClass = (jclass)mEnv->NewGlobalRef(clazz);
-    mObject = mEnv->NewWeakGlobalRef(thiz);
+    mClass = (jclass)env->NewGlobalRef(clazz);
+    mObject = env->NewWeakGlobalRef(thiz);
 
     mImpl = new FFDemux();
 }
 
-JFfmpegExtractor::~JFfmpegExtractor()
+void JFfmpegExtractor::JFfmpegRlease(JNIEnv *env)
 {
-    mEnv->DeleteWeakGlobalRef(mObject);
+	env->DeleteWeakGlobalRef(mObject);
     mObject = NULL;
-    mEnv->DeleteGlobalRef(mClass);
+    env->DeleteGlobalRef(mClass);
     mClass = NULL;
 }
 
@@ -188,37 +164,62 @@ int JFfmpegExtractor::getTrackCount ()
     	return 0;
 }
 
-status_t JFfmpegExtractor::getTrackFormat (jint index, jobject* format)
+jobject JFfmpegExtractor::makeByteBufferObject(
+        JNIEnv *env, const void *data, size_t size) {
+    jbyteArray byteArrayObj = env->NewByteArray(size);
+    env->SetByteArrayRegion(byteArrayObj, 0, size, (const jbyte *)data);
+
+    jclass clazz = env->FindClass("java/nio/ByteBuffer");
+    CHECK(clazz != NULL);
+
+    jmethodID byteBufWrapID =
+        env->GetStaticMethodID(
+        		clazz, "wrap", "([B)Ljava/nio/ByteBuffer;");
+    CHECK(byteBufWrapID != NULL);
+
+    jobject byteBufObj = env->CallStaticObjectMethod(
+            clazz, byteBufWrapID, byteArrayObj);
+
+    env->DeleteLocalRef(byteArrayObj); byteArrayObj = NULL;
+
+    return byteBufObj;
+}
+
+status_t JFfmpegExtractor::getTrackFormat (JNIEnv *env, jint index, jobject* format)
 {
     FFDemux::TrackInfo* pinfo;
     jobject jmediaformat = NULL;
     jstring mime;
+    jclass MediaFormatClazz;
 
     if (mImpl)
         mImpl->getTrackFormat(index, &pinfo);
 
-    jclass MediaFormatClazz = mEnv->FindClass("android/media/MediaFormat");
+    MediaFormatClazz = env->FindClass("android/media/MediaFormat");
 
     if (MediaFormatClazz == NULL) {
         return -EINVAL;
     }
 
-    mime = mEnv->NewStringUTF(pinfo->mime.c_str());
+    mime = env->NewStringUTF(pinfo->mime.c_str());
     if (pinfo->mTrackType == 0) {
         jmethodID CreateMFormatID =
-                mEnv->GetStaticMethodID(
+        		env->GetStaticMethodID(
                     MediaFormatClazz,
                     "createVideoFormat",
                     "(Ljava/lang/String;II)Landroid/media/MediaFormat;");
 
         if (CreateMFormatID == NULL)
             return -EINVAL;
-        jmediaformat = mEnv->CallStaticObjectMethod(
+        jmediaformat = env->CallStaticObjectMethod(
 							MediaFormatClazz, CreateMFormatID, mime,
 							pinfo->video.width, pinfo->video.height);
     } else if (pinfo->mTrackType == 1) {
+    	jstring name;
+    	jobject val;
+    	jmethodID SetPropID;
         jmethodID CreateMFormatID =
-                mEnv->GetStaticMethodID(
+        		env->GetStaticMethodID(
                     MediaFormatClazz,
                     "createAudioFormat",
                     "(Ljava/lang/String;II)Landroid/media/MediaFormat;");
@@ -226,11 +227,30 @@ status_t JFfmpegExtractor::getTrackFormat (jint index, jobject* format)
         if (CreateMFormatID == NULL)
             return -EINVAL;
 
-        jmediaformat = mEnv->CallStaticObjectMethod(
+        jmediaformat = env->CallStaticObjectMethod(
                     MediaFormatClazz, CreateMFormatID, mime,
                     pinfo->audio.sampleRate, pinfo->audio.channels);
+
+        /* set csd */
+        SetPropID = env->GetMethodID(MediaFormatClazz,
+                    "setByteBuffer", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)V");
+        if (SetPropID && pinfo->mExtraData) {
+        	LOGE(" pass csd \n");
+			name = env->NewStringUTF("csd-0");
+			val = makeByteBufferObject(env, pinfo->mExtraData,
+					pinfo->mExtraSize);
+			env->CallVoidMethod(jmediaformat,SetPropID, name, val);
+			if (name) {
+				env->DeleteLocalRef(name);
+				name = NULL;
+			}
+			if (val) {
+				env->DeleteLocalRef(val);
+				val = NULL;
+			}
+        }
     }
-    mEnv->DeleteLocalRef(mime); mime = NULL;
+    env->DeleteLocalRef(mime); mime = NULL;
 
     *format = jmediaformat;
     return 0;
@@ -263,9 +283,8 @@ jboolean JFfmpegExtractor::advance ()
         return false;
 }
 
-jint JFfmpegExtractor::readSampleData (jobject byteBuf, jint offset,  size_t *sampleSize)
+jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset,  size_t *sampleSize)
 {
-    JNIEnv *env = mEnv;
     status_t err;
     void *dst = env->GetDirectBufferAddress(byteBuf);
     jlong dstSize;
@@ -311,11 +330,11 @@ jint JFfmpegExtractor::readSampleData (jobject byteBuf, jint offset,  size_t *sa
         env->ReleaseByteArrayElements(byteArray, (jbyte *)dst, 0);
     }
 
+    *sampleSize = size;
+
     if (err < 0) {
         return err;
     }
-
-    *sampleSize = size;
 
     return OK;
 }
@@ -461,7 +480,7 @@ static jobject FFmpegExtractor_getTrackFormatNative (JNIEnv *env, jobject object
     }
 
     jobject format;
-    status_t err = extractor->getTrackFormat(index, &format);
+    status_t err = extractor->getTrackFormat(env, index, &format);
     return format;
 }
 
@@ -517,13 +536,13 @@ static jint FFmpegExtractor_readSampleData (JNIEnv *env, jobject object,
         return -1;
     }
 
-    err = extractor->readSampleData(byteBuf, offset, &sampleSize);
+    err = extractor->readSampleData(env, byteBuf, offset, &sampleSize);
 
     if (err == ERROR_END_OF_STREAM) {
         return -1;
     } else if (err != OK) {
         jniThrowException(env, "java/lang/IllegalArgumentException", NULL);
-        return false;
+        return -1;
     }
 
     return sampleSize;
@@ -603,6 +622,8 @@ static void FFmpegExtractor_native_setup (JNIEnv *env, jobject object)
 
 static void FFmpegExtractor_native_finalize (JNIEnv *env, jobject object)
 {
+	JFfmpegExtractor* extractor = getMediaExtractor(env, object);
+	extractor->JFfmpegRlease(env);
     FFmpegExtractor_release(env, object);
 }
 

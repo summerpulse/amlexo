@@ -10,7 +10,9 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaCodec.CryptoInfo;
+import android.media.MediaCodec;
 import android.media.MediaFormat;
+import android.media.MediaExtractor;
 import android.net.Uri;
 
 
@@ -103,7 +105,7 @@ public class FFExtractor {
 //		}
 //	}
 
-	public void setDataSource(String path) {
+	public void setDataSource(String path)  throws IOException {
 		// TODO Auto-generated method stub
 		try {
 			setDataSource_native(path, null, null);
@@ -143,7 +145,7 @@ public class FFExtractor {
 	    }
 
 	public void setDataSource(
-            Context context, Uri uri, Map<String, String> headers) {
+            Context context, Uri uri, Map<String, String> headers) throws IOException {
 		// TODO Auto-generated method stub
         String scheme = uri.getScheme();
         if(scheme == null || scheme.equals("file")) {
