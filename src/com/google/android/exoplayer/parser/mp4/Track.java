@@ -20,57 +20,62 @@ import com.google.android.exoplayer.MediaFormat;
 /**
  * Encapsulates information describing an MP4 track.
  */
-public final class Track {
+public final class Track
+{
 
-  /**
-   * Type of a video track.
-   */
-  public static final int TYPE_VIDEO = 0x76696465;
-  /**
-   * Type of an audio track.
-   */
-  public static final int TYPE_AUDIO = 0x736F756E;
-  /**
-   * Type of a hint track.
-   */
-  public static final int TYPE_HINT = 0x68696E74;
-  /**
-   * Type of a meta track.
-   */
-  public static final int TYPE_META = 0x6D657461;
+    /**
+     * Type of a video track.
+     */
+    public static final int TYPE_VIDEO = 0x76696465;
+    /**
+     * Type of an audio track.
+     */
+    public static final int TYPE_AUDIO = 0x736F756E;
+    /**
+     * Type of a hint track.
+     */
+    public static final int TYPE_HINT = 0x68696E74;
+    /**
+     * Type of a meta track.
+     */
+    public static final int TYPE_META = 0x6D657461;
 
-  /**
-   * The track identifier.
-   */
-  public final int id;
+    /**
+     * The track identifier.
+     */
+    public final int id;
 
-  /**
-   * One of {@link #TYPE_VIDEO}, {@link #TYPE_AUDIO}, {@link #TYPE_HINT} and {@link #TYPE_META}.
-   */
-  public final int type;
+    /**
+     * One of {@link #TYPE_VIDEO}, {@link #TYPE_AUDIO}, {@link #TYPE_HINT} and
+     * {@link #TYPE_META}.
+     */
+    public final int type;
 
-  /**
-   * The track timescale, defined as the number of time units that pass in one second.
-   */
-  public final long timescale;
+    /**
+     * The track timescale, defined as the number of time units that pass in one
+     * second.
+     */
+    public final long timescale;
 
-  /**
-   * The format if {@link #type} is {@link #TYPE_VIDEO} or {@link #TYPE_AUDIO}. Null otherwise.
-   */
-  public final MediaFormat mediaFormat;
+    /**
+     * The format if {@link #type} is {@link #TYPE_VIDEO} or {@link #TYPE_AUDIO}
+     * . Null otherwise.
+     */
+    public final MediaFormat mediaFormat;
 
-  /**
-   * Track encryption boxes for the different track sample descriptions. Entries may be null.
-   */
-  public final TrackEncryptionBox[] sampleDescriptionEncryptionBoxes;
+    /**
+     * Track encryption boxes for the different track sample descriptions.
+     * Entries may be null.
+     */
+    public final TrackEncryptionBox[] sampleDescriptionEncryptionBoxes;
 
-  public Track(int id, int type, long timescale, MediaFormat mediaFormat,
-      TrackEncryptionBox[] sampleDescriptionEncryptionBoxes) {
-    this.id = id;
-    this.type = type;
-    this.timescale = timescale;
-    this.mediaFormat = mediaFormat;
-    this.sampleDescriptionEncryptionBoxes = sampleDescriptionEncryptionBoxes;
-  }
+    public Track(int id, int type, long timescale, MediaFormat mediaFormat, TrackEncryptionBox[] sampleDescriptionEncryptionBoxes)
+    {
+        this.id = id;
+        this.type = type;
+        this.timescale = timescale;
+        this.mediaFormat = mediaFormat;
+        this.sampleDescriptionEncryptionBoxes = sampleDescriptionEncryptionBoxes;
+    }
 
 }

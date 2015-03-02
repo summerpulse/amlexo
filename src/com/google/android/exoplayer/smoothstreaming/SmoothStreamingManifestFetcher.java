@@ -26,44 +26,53 @@ import java.io.IOException;
 import java.io.InputStream;
 
 /**
- * A concrete implementation of {@link ManifestFetcher} for loading SmoothStreaming
- * manifests.
+ * A concrete implementation of {@link ManifestFetcher} for loading
+ * SmoothStreaming manifests.
  * <p>
- * This class is provided for convenience, however it is expected that most applications will
- * contain their own mechanisms for making asynchronous network requests and parsing the response.
- * In such cases it is recommended that application developers use their existing solution rather
- * than this one.
+ * This class is provided for convenience, however it is expected that most
+ * applications will contain their own mechanisms for making asynchronous
+ * network requests and parsing the response. In such cases it is recommended
+ * that application developers use their existing solution rather than this one.
  */
-public final class SmoothStreamingManifestFetcher extends ManifestFetcher<SmoothStreamingManifest> {
+public final class SmoothStreamingManifestFetcher extends ManifestFetcher<SmoothStreamingManifest>
+{
 
-  private final SmoothStreamingManifestParser parser;
+    private final SmoothStreamingManifestParser parser;
 
-  /**
-   * @param callback The callback to provide with the parsed manifest (or error).
-   */
-  public SmoothStreamingManifestFetcher(ManifestCallback<SmoothStreamingManifest> callback) {
-    super(callback);
-    parser = new SmoothStreamingManifestParser();
-  }
-
-  /**
-   * @param callback The callback to provide with the parsed manifest (or error).
-   * @param timeoutMillis The timeout in milliseconds for the connection used to load the data.
-   */
-  public SmoothStreamingManifestFetcher(ManifestCallback<SmoothStreamingManifest> callback,
-      int timeoutMillis) {
-    super(callback, timeoutMillis);
-    parser = new SmoothStreamingManifestParser();
-  }
-
-  @Override
-  protected SmoothStreamingManifest parse(InputStream stream, String inputEncoding,
-      String contentId, Uri baseUrl) throws IOException, ParserException {
-    try {
-      return parser.parse(stream, inputEncoding);
-    } catch (XmlPullParserException e) {
-      throw new ParserException(e);
+    /**
+     * @param callback
+     *            The callback to provide with the parsed manifest (or error).
+     */
+    public SmoothStreamingManifestFetcher(ManifestCallback<SmoothStreamingManifest> callback)
+    {
+        super(callback);
+        parser = new SmoothStreamingManifestParser();
     }
-  }
+
+    /**
+     * @param callback
+     *            The callback to provide with the parsed manifest (or error).
+     * @param timeoutMillis
+     *            The timeout in milliseconds for the connection used to load
+     *            the data.
+     */
+    public SmoothStreamingManifestFetcher(ManifestCallback<SmoothStreamingManifest> callback, int timeoutMillis)
+    {
+        super(callback, timeoutMillis);
+        parser = new SmoothStreamingManifestParser();
+    }
+
+    @Override
+    protected SmoothStreamingManifest parse(InputStream stream, String inputEncoding, String contentId, Uri baseUrl) throws IOException, ParserException
+    {
+        try
+        {
+            return parser.parse(stream, inputEncoding);
+        }
+        catch (XmlPullParserException e)
+        {
+            throw new ParserException(e);
+        }
+    }
 
 }

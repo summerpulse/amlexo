@@ -20,39 +20,47 @@ import com.google.android.exoplayer.util.Assertions;
 import java.io.IOException;
 
 /**
- * Allows {@link #open(DataSpec)} and {@link #read(byte[], int, int)} calls only if the specified
- * priority is the highest priority of any task. {@link NetworkLock.PriorityTooLowException} is
- * thrown when this condition does not hold.
+ * Allows {@link #open(DataSpec)} and {@link #read(byte[], int, int)} calls only
+ * if the specified priority is the highest priority of any task.
+ * {@link NetworkLock.PriorityTooLowException} is thrown when this condition
+ * does not hold.
  */
-public class PriorityDataSource implements DataSource {
+public class PriorityDataSource implements DataSource
+{
 
-  private final DataSource upstream;
-  private final int priority;
+    private final DataSource upstream;
+    private final int priority;
 
-  /**
-   * @param priority The priority of the source.
-   * @param upstream The upstream {@link DataSource}.
-   */
-  public PriorityDataSource(int priority, DataSource upstream) {
-    this.priority = priority;
-    this.upstream = Assertions.checkNotNull(upstream);
-  }
+    /**
+     * @param priority
+     *            The priority of the source.
+     * @param upstream
+     *            The upstream {@link DataSource}.
+     */
+    public PriorityDataSource(int priority, DataSource upstream)
+    {
+        this.priority = priority;
+        this.upstream = Assertions.checkNotNull(upstream);
+    }
 
-  @Override
-  public long open(DataSpec dataSpec) throws IOException {
-    NetworkLock.instance.proceedOrThrow(priority);
-    return upstream.open(dataSpec);
-  }
+    @Override
+    public long open(DataSpec dataSpec) throws IOException
+    {
+        NetworkLock.instance.proceedOrThrow(priority);
+        return upstream.open(dataSpec);
+    }
 
-  @Override
-  public int read(byte[] buffer, int offset, int max) throws IOException {
-    NetworkLock.instance.proceedOrThrow(priority);
-    return upstream.read(buffer, offset, max);
-  }
+    @Override
+    public int read(byte[] buffer, int offset, int max) throws IOException
+    {
+        NetworkLock.instance.proceedOrThrow(priority);
+        return upstream.read(buffer, offset, max);
+    }
 
-  @Override
-  public void close() throws IOException {
-    upstream.close();
-  }
+    @Override
+    public void close() throws IOException
+    {
+        upstream.close();
+    }
 
 }

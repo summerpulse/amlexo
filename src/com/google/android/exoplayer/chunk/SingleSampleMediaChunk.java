@@ -29,115 +29,150 @@ import java.util.UUID;
 /**
  * A {@link MediaChunk} containing a single sample.
  */
-public class SingleSampleMediaChunk extends MediaChunk {
+public class SingleSampleMediaChunk extends MediaChunk
+{
 
-  /**
-   * The sample header data. May be null.
-   */
-  public final byte[] headerData;
+    /**
+     * The sample header data. May be null.
+     */
+    public final byte[] headerData;
 
-  private final MediaFormat sampleFormat;
+    private final MediaFormat sampleFormat;
 
-  /**
-   * @param dataSource A {@link DataSource} for loading the data.
-   * @param dataSpec Defines the data to be loaded.
-   * @param format The format of the stream to which this chunk belongs.
-   * @param trigger The reason for this chunk being selected.
-   * @param startTimeUs The start time of the media contained by the chunk, in microseconds.
-   * @param endTimeUs The end time of the media contained by the chunk, in microseconds.
-   * @param nextChunkIndex The index of the next chunk, or -1 if this is the last chunk.
-   * @param sampleFormat The format of the media contained by the chunk.
-   */
-  public SingleSampleMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format,
-      int trigger, long startTimeUs, long endTimeUs, int nextChunkIndex, MediaFormat sampleFormat) {
-    this(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex,
-        sampleFormat, null);
-  }
-
-  /**
-   * @param dataSource A {@link DataSource} for loading the data.
-   * @param dataSpec Defines the data to be loaded.
-   * @param format The format of the stream to which this chunk belongs.
-   * @param trigger The reason for this chunk being selected.
-   * @param startTimeUs The start time of the media contained by the chunk, in microseconds.
-   * @param endTimeUs The end time of the media contained by the chunk, in microseconds.
-   * @param nextChunkIndex The index of the next chunk, or -1 if this is the last chunk.
-   * @param sampleFormat The format of the media contained by the chunk.
-   * @param headerData Custom header data for the sample. May be null. If set, the header data is
-   *     prepended to the sample data returned when {@link #read(SampleHolder)} is called. It is
-   *     however not considered part of the loaded data, and so is not prepended to the data
-   *     returned by {@link #getLoadedData()}. It is also not reflected in the values returned by
-   *     {@link #bytesLoaded()} and {@link #getLength()}.
-   */
-  public SingleSampleMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format,
-      int trigger, long startTimeUs, long endTimeUs, int nextChunkIndex, MediaFormat sampleFormat,
-      byte[] headerData) {
-    super(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex);
-    this.sampleFormat = sampleFormat;
-    this.headerData = headerData;
-  }
-
-  @Override
-  public boolean prepare() {
-    return true;
-  }
-
-  @Override
-  public boolean sampleAvailable() {
-    return isLoadFinished() && !isReadFinished();
-  }
-
-  @Override
-  public boolean read(SampleHolder holder) {
-    NonBlockingInputStream inputStream = getNonBlockingInputStream();
-    Assertions.checkState(inputStream != null);
-    if (!sampleAvailable()) {
-      return false;
+    /**
+     * @param dataSource
+     *            A {@link DataSource} for loading the data.
+     * @param dataSpec
+     *            Defines the data to be loaded.
+     * @param format
+     *            The format of the stream to which this chunk belongs.
+     * @param trigger
+     *            The reason for this chunk being selected.
+     * @param startTimeUs
+     *            The start time of the media contained by the chunk, in
+     *            microseconds.
+     * @param endTimeUs
+     *            The end time of the media contained by the chunk, in
+     *            microseconds.
+     * @param nextChunkIndex
+     *            The index of the next chunk, or -1 if this is the last chunk.
+     * @param sampleFormat
+     *            The format of the media contained by the chunk.
+     */
+    public SingleSampleMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format, int trigger, long startTimeUs, long endTimeUs, int nextChunkIndex, MediaFormat sampleFormat)
+    {
+        this(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex, sampleFormat, null);
     }
-    int bytesLoaded = (int) bytesLoaded();
-    int sampleSize = bytesLoaded;
-    if (headerData != null) {
-      sampleSize += headerData.length;
+
+    /**
+     * @param dataSource
+     *            A {@link DataSource} for loading the data.
+     * @param dataSpec
+     *            Defines the data to be loaded.
+     * @param format
+     *            The format of the stream to which this chunk belongs.
+     * @param trigger
+     *            The reason for this chunk being selected.
+     * @param startTimeUs
+     *            The start time of the media contained by the chunk, in
+     *            microseconds.
+     * @param endTimeUs
+     *            The end time of the media contained by the chunk, in
+     *            microseconds.
+     * @param nextChunkIndex
+     *            The index of the next chunk, or -1 if this is the last chunk.
+     * @param sampleFormat
+     *            The format of the media contained by the chunk.
+     * @param headerData
+     *            Custom header data for the sample. May be null. If set, the
+     *            header data is prepended to the sample data returned when
+     *            {@link #read(SampleHolder)} is called. It is however not
+     *            considered part of the loaded data, and so is not prepended to
+     *            the data returned by {@link #getLoadedData()}. It is also not
+     *            reflected in the values returned by {@link #bytesLoaded()} and
+     *            {@link #getLength()}.
+     */
+    public SingleSampleMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format, int trigger, long startTimeUs, long endTimeUs, int nextChunkIndex, MediaFormat sampleFormat, byte[] headerData)
+    {
+        super(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex);
+        this.sampleFormat = sampleFormat;
+        this.headerData = headerData;
     }
-    if (holder.allowDataBufferReplacement &&
-        (holder.data == null || holder.data.capacity() < sampleSize)) {
-      holder.data = ByteBuffer.allocate(sampleSize);
+
+    @Override
+    public boolean prepare()
+    {
+        return true;
     }
-    int bytesRead;
-    if (holder.data != null) {
-      if (headerData != null) {
-        holder.data.put(headerData);
-      }
-      bytesRead = inputStream.read(holder.data, bytesLoaded);
-      holder.size = sampleSize;
-    } else {
-      bytesRead = inputStream.skip(bytesLoaded);
-      holder.size = 0;
+
+    @Override
+    public boolean sampleAvailable()
+    {
+        return isLoadFinished() && !isReadFinished();
     }
-    Assertions.checkState(bytesRead == bytesLoaded);
-    holder.timeUs = startTimeUs;
-    return true;
-  }
 
-  @Override
-  public void seekToStart() {
-    resetReadPosition();
-  }
+    @Override
+    public boolean read(SampleHolder holder)
+    {
+        NonBlockingInputStream inputStream = getNonBlockingInputStream();
+        Assertions.checkState(inputStream != null);
+        if (!sampleAvailable())
+        {
+            return false;
+        }
+        int bytesLoaded = (int) bytesLoaded();
+        int sampleSize = bytesLoaded;
+        if (headerData != null)
+        {
+            sampleSize += headerData.length;
+        }
+        if (holder.allowDataBufferReplacement && (holder.data == null || holder.data.capacity() < sampleSize))
+        {
+            holder.data = ByteBuffer.allocate(sampleSize);
+        }
+        int bytesRead;
+        if (holder.data != null)
+        {
+            if (headerData != null)
+            {
+                holder.data.put(headerData);
+            }
+            bytesRead = inputStream.read(holder.data, bytesLoaded);
+            holder.size = sampleSize;
+        }
+        else
+        {
+            bytesRead = inputStream.skip(bytesLoaded);
+            holder.size = 0;
+        }
+        Assertions.checkState(bytesRead == bytesLoaded);
+        holder.timeUs = startTimeUs;
+        return true;
+    }
 
-  @Override
-  public boolean seekTo(long positionUs, boolean allowNoop) {
-    resetReadPosition();
-    return true;
-  }
+    @Override
+    public void seekToStart()
+    {
+        resetReadPosition();
+    }
 
-  @Override
-  public MediaFormat getMediaFormat() {
-    return sampleFormat;
-  }
+    @Override
+    public boolean seekTo(long positionUs, boolean allowNoop)
+    {
+        resetReadPosition();
+        return true;
+    }
 
-  @Override
-  public Map<UUID, byte[]> getPsshInfo() {
-    return null;
-  }
+    @Override
+    public MediaFormat getMediaFormat()
+    {
+        return sampleFormat;
+    }
+
+    @Override
+    public Map<UUID, byte[]> getPsshInfo()
+    {
+        return null;
+    }
 
 }

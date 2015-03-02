@@ -18,31 +18,36 @@ package com.google.android.exoplayer;
 /**
  * Contains information about a media decoder.
  */
-public final class DecoderInfo {
+public final class DecoderInfo
+{
 
-  /**
-   * The name of the decoder.
-   * <p>
-   * May be passed to {@link android.media.MediaCodec#createByCodecName(String)} to create an
-   * instance of the decoder.
-   */
-  public final String name;
+    /**
+     * The name of the decoder.
+     * <p>
+     * May be passed to
+     * {@link android.media.MediaCodec#createByCodecName(String)} to create an
+     * instance of the decoder.
+     */
+    public final String name;
 
-  /**
-   * Whether the decoder is adaptive.
-   *
-   * @see android.media.MediaCodecInfo.CodecCapabilities#isFeatureSupported(String)
-   * @see android.media.MediaCodecInfo.CodecCapabilities#FEATURE_AdaptivePlayback
-   */
-  public final boolean adaptive;
+    /**
+     * Whether the decoder is adaptive.
+     *
+     * @see android.media.MediaCodecInfo.CodecCapabilities#isFeatureSupported(String)
+     * @see android.media.MediaCodecInfo.CodecCapabilities#FEATURE_AdaptivePlayback
+     */
+    public final boolean adaptive;
 
-  /**
-   * @param name The name of the decoder.
-   * @param adaptive Whether the decoder is adaptive.
-   */
-  /* package */ DecoderInfo(String name, boolean adaptive) {
-    this.name = name;
-    this.adaptive = adaptive;
-  }
+    /**
+     * @param name
+     *            The name of the decoder.
+     * @param adaptive
+     *            Whether the decoder is adaptive.
+     */
+    /* package */DecoderInfo(String name, boolean adaptive)
+    {
+        this.name = name;
+        this.adaptive = adaptive;
+    }
 
 }

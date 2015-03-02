@@ -21,26 +21,31 @@ import java.io.InputStream;
 /**
  * Parses {@link Subtitle}s from {@link InputStream}s.
  */
-public interface SubtitleParser {
+public interface SubtitleParser
+{
 
-  /**
-   * Checks whether the parser supports a given subtitle mime type.
-   *
-   * @param mimeType A subtitle mime type.
-   * @return Whether the mime type is supported.
-   */
-  public boolean canParse(String mimeType);
+    /**
+     * Checks whether the parser supports a given subtitle mime type.
+     *
+     * @param mimeType
+     *            A subtitle mime type.
+     * @return Whether the mime type is supported.
+     */
+    public boolean canParse(String mimeType);
 
-  /**
-   * Parses a {@link Subtitle} from the provided {@link InputStream}.
-   *
-   * @param inputStream The stream from which to parse the subtitle.
-   * @param inputEncoding The encoding of the input stream.
-   * @param startTimeUs The start time of the subtitle.
-   * @return A parsed representation of the subtitle.
-   * @throws IOException If a problem occurred reading from the stream.
-   */
-  public Subtitle parse(InputStream inputStream, String inputEncoding, long startTimeUs)
-      throws IOException;
+    /**
+     * Parses a {@link Subtitle} from the provided {@link InputStream}.
+     *
+     * @param inputStream
+     *            The stream from which to parse the subtitle.
+     * @param inputEncoding
+     *            The encoding of the input stream.
+     * @param startTimeUs
+     *            The start time of the subtitle.
+     * @return A parsed representation of the subtitle.
+     * @throws IOException
+     *             If a problem occurred reading from the stream.
+     */
+    public Subtitle parse(InputStream inputStream, String inputEncoding, long startTimeUs) throws IOException;
 
 }

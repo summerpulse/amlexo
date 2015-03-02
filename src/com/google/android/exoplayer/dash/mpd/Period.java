@@ -21,39 +21,47 @@ import java.util.List;
 /**
  * Encapsulates media content components over a contiguous period of time.
  */
-public final class Period {
+public final class Period
+{
 
-  /**
-   * The period identifier, if one exists.
-   */
-  public final String id;
+    /**
+     * The period identifier, if one exists.
+     */
+    public final String id;
 
-  /**
-   * The start time of the period in milliseconds.
-   */
-  public final long startMs;
+    /**
+     * The start time of the period in milliseconds.
+     */
+    public final long startMs;
 
-  /**
-   * The duration of the period in milliseconds, or -1 if the duration is unknown.
-   */
-  public final long durationMs;
+    /**
+     * The duration of the period in milliseconds, or -1 if the duration is
+     * unknown.
+     */
+    public final long durationMs;
 
-  /**
-   * The adaptation sets belonging to the period.
-   */
-  public final List<AdaptationSet> adaptationSets;
+    /**
+     * The adaptation sets belonging to the period.
+     */
+    public final List<AdaptationSet> adaptationSets;
 
-  /**
-   * @param id The period identifier. May be null.
-   * @param start The start time of the period in milliseconds.
-   * @param duration The duration of the period in milliseconds, or -1 if the duration is unknown.
-   * @param adaptationSets The adaptation sets belonging to the period.
-   */
-  public Period(String id, long start, long duration, List<AdaptationSet> adaptationSets) {
-    this.id = id;
-    this.startMs = start;
-    this.durationMs = duration;
-    this.adaptationSets = Collections.unmodifiableList(adaptationSets);
-  }
+    /**
+     * @param id
+     *            The period identifier. May be null.
+     * @param start
+     *            The start time of the period in milliseconds.
+     * @param duration
+     *            The duration of the period in milliseconds, or -1 if the
+     *            duration is unknown.
+     * @param adaptationSets
+     *            The adaptation sets belonging to the period.
+     */
+    public Period(String id, long start, long duration, List<AdaptationSet> adaptationSets)
+    {
+        this.id = id;
+        this.startMs = start;
+        this.durationMs = duration;
+        this.adaptationSets = Collections.unmodifiableList(adaptationSets);
+    }
 
 }

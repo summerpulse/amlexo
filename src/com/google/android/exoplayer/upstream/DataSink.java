@@ -20,33 +20,38 @@ import java.io.IOException;
 /**
  * A component that consumes media data.
  */
-public interface DataSink {
+public interface DataSink
+{
 
-  /**
-   * Opens the {@link DataSink} to consume the specified data. Calls to {@link #open(DataSpec)} and
-   * {@link #close()} must be balanced.
-   *
-   * @param dataSpec Defines the data to be consumed.
-   * @return This {@link DataSink}, for convenience.
-   * @throws IOException
-   */
-  public DataSink open(DataSpec dataSpec) throws IOException;
+    /**
+     * Opens the {@link DataSink} to consume the specified data. Calls to
+     * {@link #open(DataSpec)} and {@link #close()} must be balanced.
+     *
+     * @param dataSpec
+     *            Defines the data to be consumed.
+     * @return This {@link DataSink}, for convenience.
+     * @throws IOException
+     */
+    public DataSink open(DataSpec dataSpec) throws IOException;
 
-  /**
-   * Closes the {@link DataSink}.
-   *
-   * @throws IOException
-   */
-  public void close() throws IOException;
+    /**
+     * Closes the {@link DataSink}.
+     *
+     * @throws IOException
+     */
+    public void close() throws IOException;
 
-  /**
-   * Consumes the provided data.
-   *
-   * @param buffer The buffer from which data should be consumed.
-   * @param offset The offset of the data to consume in {@code buffer}.
-   * @param length The length of the data to consume, in bytes.
-   * @throws IOException
-   */
-  public void write(byte[] buffer, int offset, int length) throws IOException;
+    /**
+     * Consumes the provided data.
+     *
+     * @param buffer
+     *            The buffer from which data should be consumed.
+     * @param offset
+     *            The offset of the data to consume in {@code buffer}.
+     * @param length
+     *            The length of the data to consume, in bytes.
+     * @throws IOException
+     */
+    public void write(byte[] buffer, int offset, int length) throws IOException;
 
 }

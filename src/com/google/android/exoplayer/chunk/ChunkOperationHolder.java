@@ -16,19 +16,20 @@
 package com.google.android.exoplayer.chunk;
 
 /**
- * Holds a chunk operation, which consists of a {@link Chunk} to load together with the number of
- * {@link MediaChunk}s that should be retained on the queue.
+ * Holds a chunk operation, which consists of a {@link Chunk} to load together
+ * with the number of {@link MediaChunk}s that should be retained on the queue.
  */
-public final class ChunkOperationHolder {
+public final class ChunkOperationHolder
+{
 
-  /**
-   * The number of {@link MediaChunk}s to retain in a queue.
-   */
-  public int queueSize;
+    /**
+     * The number of {@link MediaChunk}s to retain in a queue.
+     */
+    public int queueSize;
 
-  /**
-   * The chunk.
-   */
-  public Chunk chunk;
+    /**
+     * The chunk.
+     */
+    public Chunk chunk;
 
 }

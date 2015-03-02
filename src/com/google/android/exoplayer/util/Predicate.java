@@ -18,16 +18,19 @@ package com.google.android.exoplayer.util;
 /**
  * Determines a true of false value for a given input.
  *
- * @param <T> The input type of the predicate.
+ * @param <T>
+ *            The input type of the predicate.
  */
-public interface Predicate<T> {
+public interface Predicate<T>
+{
 
-  /**
-   * Evaluates an input.
-   *
-   * @param input The input to evaluate.
-   * @return The evaluated result.
-   */
-  boolean evaluate(T input);
+    /**
+     * Evaluates an input.
+     *
+     * @param input
+     *            The input to evaluate.
+     * @return The evaluated result.
+     */
+    boolean evaluate(T input);
 
 }

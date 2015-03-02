@@ -24,38 +24,48 @@ import java.io.IOException;
 /**
  * A {@link DataSink} for writing to a byte array.
  */
-public class ByteArrayDataSink implements DataSink {
+public class ByteArrayDataSink implements DataSink
+{
 
-  private ByteArrayOutputStream stream;
+    private ByteArrayOutputStream stream;
 
-  @Override
-  public DataSink open(DataSpec dataSpec) throws IOException {
-    if (dataSpec.length == C.LENGTH_UNBOUNDED) {
-      stream = new ByteArrayOutputStream();
-    } else {
-      Assertions.checkArgument(dataSpec.length <= Integer.MAX_VALUE);
-      stream = new ByteArrayOutputStream((int) dataSpec.length);
+    @Override
+    public DataSink open(DataSpec dataSpec) throws IOException
+    {
+        if (dataSpec.length == C.LENGTH_UNBOUNDED)
+        {
+            stream = new ByteArrayOutputStream();
+        }
+        else
+        {
+            Assertions.checkArgument(dataSpec.length <= Integer.MAX_VALUE);
+            stream = new ByteArrayOutputStream((int) dataSpec.length);
+        }
+        return this;
     }
-    return this;
-  }
 
-  @Override
-  public void close() throws IOException {
-    stream.close();
-  }
+    @Override
+    public void close() throws IOException
+    {
+        stream.close();
+    }
 
-  @Override
-  public void write(byte[] buffer, int offset, int length) throws IOException {
-    stream.write(buffer, offset, length);
-  }
+    @Override
+    public void write(byte[] buffer, int offset, int length) throws IOException
+    {
+        stream.write(buffer, offset, length);
+    }
 
-  /**
-   * Returns the data written to the sink since the last call to {@link #open(DataSpec)}.
-   *
-   * @return The data, or null if {@link #open(DataSpec)} has never been called.
-   */
-  public byte[] getData() {
-    return stream == null ? null : stream.toByteArray();
-  }
+    /**
+     * Returns the data written to the sink since the last call to
+     * {@link #open(DataSpec)}.
+     *
+     * @return The data, or null if {@link #open(DataSpec)} has never been
+     *         called.
+     */
+    public byte[] getData()
+    {
+        return stream == null ? null : stream.toByteArray();
+    }
 
 }

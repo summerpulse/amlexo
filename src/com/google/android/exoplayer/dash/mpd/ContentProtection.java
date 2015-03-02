@@ -19,32 +19,39 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Represents a ContentProtection tag in an AdaptationSet. Holds arbitrary data for various DRM
- * schemes.
+ * Represents a ContentProtection tag in an AdaptationSet. Holds arbitrary data
+ * for various DRM schemes.
  */
-public final class ContentProtection {
+public final class ContentProtection
+{
 
-  /**
-   * Identifies the content protection scheme.
-   */
-  public final String schemeUriId;
-  /**
-   * Protection scheme specific data.
-   */
-  public final Map<String, String> keyedData;
+    /**
+     * Identifies the content protection scheme.
+     */
+    public final String schemeUriId;
+    /**
+     * Protection scheme specific data.
+     */
+    public final Map<String, String> keyedData;
 
-  /**
-   * @param schemeUriId Identifies the content protection scheme.
-   * @param keyedData Data specific to the scheme.
-   */
-  public ContentProtection(String schemeUriId, Map<String, String> keyedData) {
-    this.schemeUriId = schemeUriId;
-    if (keyedData != null) {
-      this.keyedData = Collections.unmodifiableMap(keyedData);
-    } else {
-      this.keyedData = Collections.emptyMap();
+    /**
+     * @param schemeUriId
+     *            Identifies the content protection scheme.
+     * @param keyedData
+     *            Data specific to the scheme.
+     */
+    public ContentProtection(String schemeUriId, Map<String, String> keyedData)
+    {
+        this.schemeUriId = schemeUriId;
+        if (keyedData != null)
+        {
+            this.keyedData = Collections.unmodifiableMap(keyedData);
+        }
+        else
+        {
+            this.keyedData = Collections.emptyMap();
+        }
+
     }
-
-  }
 
 }

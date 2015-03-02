@@ -18,18 +18,20 @@ package com.google.android.exoplayer.upstream;
 /**
  * Provides estimates of the currently available bandwidth.
  */
-public interface BandwidthMeter {
+public interface BandwidthMeter
+{
 
-  /**
-   * Indicates no bandwidth estimate is available.
-   */
-  final long NO_ESTIMATE = -1;
+    /**
+     * Indicates no bandwidth estimate is available.
+     */
+    final long NO_ESTIMATE = -1;
 
-  /**
-   * Gets the estimated bandwidth, in bits/sec.
-   *
-   * @return Estimated bandwidth in bits/sec, or {@link #NO_ESTIMATE} if no estimate is available.
-   */
-  long getBitrateEstimate();
+    /**
+     * Gets the estimated bandwidth, in bits/sec.
+     *
+     * @return Estimated bandwidth in bits/sec, or {@link #NO_ESTIMATE} if no
+     *         estimate is available.
+     */
+    long getBitrateEstimate();
 
 }

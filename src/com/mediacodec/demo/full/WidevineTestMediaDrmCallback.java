@@ -32,31 +32,34 @@ import java.util.UUID;
  * A {@link MediaDrmCallback} for Widevine test content.
  */
 @TargetApi(18)
-public class WidevineTestMediaDrmCallback implements MediaDrmCallback {
+public class WidevineTestMediaDrmCallback implements MediaDrmCallback
+{
 
-  private static final String WIDEVINE_GTS_DEFAULT_BASE_URI =
-      "http://wv-staging-proxy.appspot.com/proxy?provider=YouTube&video_id=";
+    private static final String WIDEVINE_GTS_DEFAULT_BASE_URI = "http://wv-staging-proxy.appspot.com/proxy?provider=YouTube&video_id=";
 
-  private final String defaultUri;
+    private final String defaultUri;
 
-  public WidevineTestMediaDrmCallback(String videoId) {
-    defaultUri = WIDEVINE_GTS_DEFAULT_BASE_URI + videoId;
-  }
-
-  @Override
-  public byte[] executeProvisionRequest(UUID uuid, ProvisionRequest request)
-      throws ClientProtocolException, IOException {
-    String url = request.getDefaultUrl() + "&signedRequest=" + new String(request.getData());
-    return DemoUtil.executePost(url, null, null);
-  }
-
-  @Override
-  public byte[] executeKeyRequest(UUID uuid, KeyRequest request) throws IOException {
-    String url = request.getDefaultUrl();
-    if (TextUtils.isEmpty(url)) {
-      url = defaultUri;
+    public WidevineTestMediaDrmCallback(String videoId)
+    {
+        defaultUri = WIDEVINE_GTS_DEFAULT_BASE_URI + videoId;
     }
-    return DemoUtil.executePost(url, request.getData(), null);
-  }
+
+    @Override
+    public byte[] executeProvisionRequest(UUID uuid, ProvisionRequest request) throws ClientProtocolException, IOException
+    {
+        String url = request.getDefaultUrl() + "&signedRequest=" + new String(request.getData());
+        return DemoUtil.executePost(url, null, null);
+    }
+
+    @Override
+    public byte[] executeKeyRequest(UUID uuid, KeyRequest request) throws IOException
+    {
+        String url = request.getDefaultUrl();
+        if (TextUtils.isEmpty(url))
+        {
+            url = defaultUri;
+        }
+        return DemoUtil.executePost(url, request.getData(), null);
+    }
 
 }

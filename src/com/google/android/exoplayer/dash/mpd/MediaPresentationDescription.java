@@ -21,25 +21,26 @@ import java.util.List;
 /**
  * Represents a DASH media presentation description (mpd).
  */
-public final class MediaPresentationDescription {
+public final class MediaPresentationDescription
+{
 
-  public final long duration;
+    public final long duration;
 
-  public final long minBufferTime;
+    public final long minBufferTime;
 
-  public final boolean dynamic;
+    public final boolean dynamic;
 
-  public final long minUpdatePeriod;
+    public final long minUpdatePeriod;
 
-  public final List<Period> periods;
+    public final List<Period> periods;
 
-  public MediaPresentationDescription(long duration, long minBufferTime, boolean dynamic,
-      long minUpdatePeriod, List<Period> periods) {
-    this.duration = duration;
-    this.minBufferTime = minBufferTime;
-    this.dynamic = dynamic;
-    this.minUpdatePeriod = minUpdatePeriod;
-    this.periods = Collections.unmodifiableList(periods);
-  }
+    public MediaPresentationDescription(long duration, long minBufferTime, boolean dynamic, long minUpdatePeriod, List<Period> periods)
+    {
+        this.duration = duration;
+        this.minBufferTime = minBufferTime;
+        this.dynamic = dynamic;
+        this.minUpdatePeriod = minUpdatePeriod;
+        this.periods = Collections.unmodifiableList(periods);
+    }
 
 }

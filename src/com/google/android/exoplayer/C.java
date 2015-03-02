@@ -18,13 +18,16 @@ package com.google.android.exoplayer;
 /**
  * Defines constants that are generally useful throughout the library.
  */
-public final class C {
+public final class C
+{
 
-  /**
-   * Represents an unbounded length of data.
-   */
-  public static final int LENGTH_UNBOUNDED = -1;
+    /**
+     * Represents an unbounded length of data.
+     */
+    public static final int LENGTH_UNBOUNDED = -1;
 
-  private C() {}
+    private C()
+    {
+    }
 
 }

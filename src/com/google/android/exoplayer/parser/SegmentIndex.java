@@ -18,53 +18,60 @@ package com.google.android.exoplayer.parser;
 /**
  * Defines segments within a media stream.
  */
-public final class SegmentIndex {
+public final class SegmentIndex
+{
 
-  /**
-   * The size in bytes of the segment index as it exists in the stream.
-   */
-  public final int sizeBytes;
+    /**
+     * The size in bytes of the segment index as it exists in the stream.
+     */
+    public final int sizeBytes;
 
-  /**
-   * The number of segments.
-   */
-  public final int length;
+    /**
+     * The number of segments.
+     */
+    public final int length;
 
-  /**
-   * The segment sizes, in bytes.
-   */
-  public final int[] sizes;
+    /**
+     * The segment sizes, in bytes.
+     */
+    public final int[] sizes;
 
-  /**
-   * The segment byte offsets.
-   */
-  public final long[] offsets;
+    /**
+     * The segment byte offsets.
+     */
+    public final long[] offsets;
 
-  /**
-   * The segment durations, in microseconds.
-   */
-  public final long[] durationsUs;
+    /**
+     * The segment durations, in microseconds.
+     */
+    public final long[] durationsUs;
 
-  /**
-   * The start time of each segment, in microseconds.
-   */
-  public final long[] timesUs;
+    /**
+     * The start time of each segment, in microseconds.
+     */
+    public final long[] timesUs;
 
-  /**
-   * @param sizeBytes The size in bytes of the segment index as it exists in the stream.
-   * @param sizes The segment sizes, in bytes.
-   * @param offsets The segment byte offsets.
-   * @param durationsUs The segment durations, in microseconds.
-   * @param timesUs The start time of each segment, in microseconds.
-   */
-  public SegmentIndex(int sizeBytes, int[] sizes, long[] offsets, long[] durationsUs,
-      long[] timesUs) {
-    this.sizeBytes = sizeBytes;
-    this.length = sizes.length;
-    this.sizes = sizes;
-    this.offsets = offsets;
-    this.durationsUs = durationsUs;
-    this.timesUs = timesUs;
-  }
+    /**
+     * @param sizeBytes
+     *            The size in bytes of the segment index as it exists in the
+     *            stream.
+     * @param sizes
+     *            The segment sizes, in bytes.
+     * @param offsets
+     *            The segment byte offsets.
+     * @param durationsUs
+     *            The segment durations, in microseconds.
+     * @param timesUs
+     *            The start time of each segment, in microseconds.
+     */
+    public SegmentIndex(int sizeBytes, int[] sizes, long[] offsets, long[] durationsUs, long[] timesUs)
+    {
+        this.sizeBytes = sizeBytes;
+        this.length = sizes.length;
+        this.sizes = sizes;
+        this.offsets = offsets;
+        this.durationsUs = durationsUs;
+        this.timesUs = timesUs;
+    }
 
 }

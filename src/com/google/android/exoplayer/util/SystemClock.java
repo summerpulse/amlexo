@@ -18,11 +18,13 @@ package com.google.android.exoplayer.util;
 /**
  * The standard implementation of {@link Clock}.
  */
-public final class SystemClock implements Clock {
+public final class SystemClock implements Clock
+{
 
-  @Override
-  public long elapsedRealtime() {
-    return android.os.SystemClock.elapsedRealtime();
-  }
+    @Override
+    public long elapsedRealtime()
+    {
+        return android.os.SystemClock.elapsedRealtime();
+    }
 
 }

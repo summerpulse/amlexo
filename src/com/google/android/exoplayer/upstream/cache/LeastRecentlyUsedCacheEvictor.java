@@ -21,56 +21,66 @@ import java.util.TreeSet;
 /**
  * Evicts least recently used cache files first.
  */
-public class LeastRecentlyUsedCacheEvictor implements CacheEvictor, Comparator<CacheSpan> {
+public class LeastRecentlyUsedCacheEvictor implements CacheEvictor, Comparator<CacheSpan>
+{
 
-  private final long maxBytes;
-  private final TreeSet<CacheSpan> leastRecentlyUsed;
+    private final long maxBytes;
+    private final TreeSet<CacheSpan> leastRecentlyUsed;
 
-  private long currentSize;
+    private long currentSize;
 
-  public LeastRecentlyUsedCacheEvictor(long maxBytes) {
-    this.maxBytes = maxBytes;
-    this.leastRecentlyUsed = new TreeSet<CacheSpan>(this);
-  }
-
-  @Override
-  public void onStartFile(Cache cache, String key, long position, long length) {
-    evictCache(cache, length);
-  }
-
-  @Override
-  public void onSpanAdded(Cache cache, CacheSpan span) {
-    leastRecentlyUsed.add(span);
-    currentSize += span.length;
-    evictCache(cache, 0);
-  }
-
-  @Override
-  public void onSpanRemoved(Cache cache, CacheSpan span) {
-    leastRecentlyUsed.remove(span);
-    currentSize -= span.length;
-  }
-
-  @Override
-  public void onSpanTouched(Cache cache, CacheSpan oldSpan, CacheSpan newSpan) {
-    onSpanRemoved(cache, oldSpan);
-    onSpanAdded(cache, newSpan);
-  }
-
-  @Override
-  public int compare(CacheSpan lhs, CacheSpan rhs) {
-    long lastAccessTimestampDelta = lhs.lastAccessTimestamp - rhs.lastAccessTimestamp;
-    if (lastAccessTimestampDelta == 0) {
-      // Use the standard compareTo method as a tie-break.
-      return lhs.compareTo(rhs);
+    public LeastRecentlyUsedCacheEvictor(long maxBytes)
+    {
+        this.maxBytes = maxBytes;
+        this.leastRecentlyUsed = new TreeSet<CacheSpan>(this);
     }
-    return lhs.lastAccessTimestamp < rhs.lastAccessTimestamp ? -1 : 1;
-  }
 
-  private void evictCache(Cache cache, long requiredSpace) {
-    while (currentSize + requiredSpace > maxBytes) {
-      cache.removeSpan(leastRecentlyUsed.first());
+    @Override
+    public void onStartFile(Cache cache, String key, long position, long length)
+    {
+        evictCache(cache, length);
     }
-  }
+
+    @Override
+    public void onSpanAdded(Cache cache, CacheSpan span)
+    {
+        leastRecentlyUsed.add(span);
+        currentSize += span.length;
+        evictCache(cache, 0);
+    }
+
+    @Override
+    public void onSpanRemoved(Cache cache, CacheSpan span)
+    {
+        leastRecentlyUsed.remove(span);
+        currentSize -= span.length;
+    }
+
+    @Override
+    public void onSpanTouched(Cache cache, CacheSpan oldSpan, CacheSpan newSpan)
+    {
+        onSpanRemoved(cache, oldSpan);
+        onSpanAdded(cache, newSpan);
+    }
+
+    @Override
+    public int compare(CacheSpan lhs, CacheSpan rhs)
+    {
+        long lastAccessTimestampDelta = lhs.lastAccessTimestamp - rhs.lastAccessTimestamp;
+        if (lastAccessTimestampDelta == 0)
+        {
+            // Use the standard compareTo method as a tie-break.
+            return lhs.compareTo(rhs);
+        }
+        return lhs.lastAccessTimestamp < rhs.lastAccessTimestamp ? -1 : 1;
+    }
+
+    private void evictCache(Cache cache, long requiredSpace)
+    {
+        while (currentSize + requiredSpace > maxBytes)
+        {
+            cache.removeSpan(leastRecentlyUsed.first());
+        }
+    }
 
 }

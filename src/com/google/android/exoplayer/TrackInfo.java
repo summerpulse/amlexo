@@ -18,14 +18,16 @@ package com.google.android.exoplayer;
 /**
  * Holds high level information about a media track.
  */
-public final class TrackInfo {
+public final class TrackInfo
+{
 
-  public final String mimeType;
-  public final long durationUs;
+    public final String mimeType;
+    public final long durationUs;
 
-  public TrackInfo(String mimeType, long durationUs) {
-    this.mimeType = mimeType;
-    this.durationUs = durationUs;
-  }
+    public TrackInfo(String mimeType, long durationUs)
+    {
+        this.mimeType = mimeType;
+        this.durationUs = durationUs;
+    }
 
 }

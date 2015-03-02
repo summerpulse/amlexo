@@ -21,47 +21,55 @@ import com.google.android.exoplayer.util.Util;
 /**
  * A representation of a TTML subtitle.
  */
-public final class TtmlSubtitle implements Subtitle {
+public final class TtmlSubtitle implements Subtitle
+{
 
-  private final TtmlNode root;
-  private final long startTimeUs;
-  private final long[] eventTimesUs;
+    private final TtmlNode root;
+    private final long startTimeUs;
+    private final long[] eventTimesUs;
 
-  public TtmlSubtitle(TtmlNode root, long startTimeUs) {
-    this.root = root;
-    this.startTimeUs = startTimeUs;
-    this.eventTimesUs = root.getEventTimesUs();
-  }
+    public TtmlSubtitle(TtmlNode root, long startTimeUs)
+    {
+        this.root = root;
+        this.startTimeUs = startTimeUs;
+        this.eventTimesUs = root.getEventTimesUs();
+    }
 
-  @Override
-  public long getStartTime() {
-    return startTimeUs;
-  }
+    @Override
+    public long getStartTime()
+    {
+        return startTimeUs;
+    }
 
-  @Override
-  public int getNextEventTimeIndex(long timeUs) {
-    int index = Util.binarySearchCeil(eventTimesUs, timeUs - startTimeUs, false, false);
-    return index < eventTimesUs.length ? index : -1;
-  }
+    @Override
+    public int getNextEventTimeIndex(long timeUs)
+    {
+        int index = Util.binarySearchCeil(eventTimesUs, timeUs - startTimeUs, false, false);
+        return index < eventTimesUs.length ? index : -1;
+    }
 
-  @Override
-  public int getEventTimeCount() {
-    return eventTimesUs.length;
-  }
+    @Override
+    public int getEventTimeCount()
+    {
+        return eventTimesUs.length;
+    }
 
-  @Override
-  public long getEventTime(int index) {
-    return eventTimesUs[index] + startTimeUs;
-  }
+    @Override
+    public long getEventTime(int index)
+    {
+        return eventTimesUs[index] + startTimeUs;
+    }
 
-  @Override
-  public long getLastEventTime() {
-    return (eventTimesUs.length == 0 ? -1 : eventTimesUs[eventTimesUs.length - 1]) + startTimeUs;
-  }
+    @Override
+    public long getLastEventTime()
+    {
+        return (eventTimesUs.length == 0 ? -1 : eventTimesUs[eventTimesUs.length - 1]) + startTimeUs;
+    }
 
-  @Override
-  public String getText(long timeUs) {
-    return root.getText(timeUs - startTimeUs);
-  }
+    @Override
+    public String getText(long timeUs)
+    {
+        return root.getText(timeUs - startTimeUs);
+    }
 
 }

@@ -20,54 +20,60 @@ import com.google.android.exoplayer.dash.mpd.RangedUri;
 /**
  * Indexes the segments within a media stream.
  *
- * TODO: Generalize to cover all chunk streaming modes (e.g. SmoothStreaming) if possible.
+ * TODO: Generalize to cover all chunk streaming modes (e.g. SmoothStreaming) if
+ * possible.
  */
-public interface DashSegmentIndex {
+public interface DashSegmentIndex
+{
 
-  /**
-   * Returns the segment number of the segment containing a given media time.
-   *
-   * @param timeUs The time in microseconds.
-   * @return The segment number of the corresponding segment.
-   */
-  int getSegmentNum(long timeUs);
+    /**
+     * Returns the segment number of the segment containing a given media time.
+     *
+     * @param timeUs
+     *            The time in microseconds.
+     * @return The segment number of the corresponding segment.
+     */
+    int getSegmentNum(long timeUs);
 
-  /**
-   * Returns the start time of a segment.
-   *
-   * @param segmentNum The segment number.
-   * @return The corresponding start time in microseconds.
-   */
-  long getTimeUs(int segmentNum);
+    /**
+     * Returns the start time of a segment.
+     *
+     * @param segmentNum
+     *            The segment number.
+     * @return The corresponding start time in microseconds.
+     */
+    long getTimeUs(int segmentNum);
 
-  /**
-   * Returns the duration of a segment.
-   *
-   * @param segmentNum The segment number.
-   * @return The duration of the segment, in microseconds.
-   */
-  long getDurationUs(int segmentNum);
+    /**
+     * Returns the duration of a segment.
+     *
+     * @param segmentNum
+     *            The segment number.
+     * @return The duration of the segment, in microseconds.
+     */
+    long getDurationUs(int segmentNum);
 
-  /**
-   * Returns a {@link RangedUri} defining the location of a segment.
-   *
-   * @param segmentNum The segment number.
-   * @return The {@link RangedUri} defining the location of the data.
-   */
-  RangedUri getSegmentUrl(int segmentNum);
+    /**
+     * Returns a {@link RangedUri} defining the location of a segment.
+     *
+     * @param segmentNum
+     *            The segment number.
+     * @return The {@link RangedUri} defining the location of the data.
+     */
+    RangedUri getSegmentUrl(int segmentNum);
 
-  /**
-   * Returns the segment number of the first segment.
-   *
-   * @return The segment number of the first segment.
-   */
-  int getFirstSegmentNum();
+    /**
+     * Returns the segment number of the first segment.
+     *
+     * @return The segment number of the first segment.
+     */
+    int getFirstSegmentNum();
 
-  /**
-   * Returns the segment number of the last segment.
-   *
-   * @return The segment number of the last segment.
-   */
-  int getLastSegmentNum();
+    /**
+     * Returns the segment number of the last segment.
+     *
+     * @return The segment number of the last segment.
+     */
+    int getLastSegmentNum();
 
 }

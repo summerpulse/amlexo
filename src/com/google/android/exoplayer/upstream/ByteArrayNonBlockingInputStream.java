@@ -20,64 +20,76 @@ import com.google.android.exoplayer.util.Assertions;
 import java.nio.ByteBuffer;
 
 /**
- * An implementation of {@link NonBlockingInputStream} for reading data from a byte array.
+ * An implementation of {@link NonBlockingInputStream} for reading data from a
+ * byte array.
  */
-public final class ByteArrayNonBlockingInputStream implements NonBlockingInputStream {
+public final class ByteArrayNonBlockingInputStream implements NonBlockingInputStream
+{
 
-  private final byte[] data;
+    private final byte[] data;
 
-  private int position;
+    private int position;
 
-  public ByteArrayNonBlockingInputStream(byte[] data) {
-    this.data = Assertions.checkNotNull(data);
-  }
-
-  @Override
-  public int skip(int length) {
-    int skipLength = getReadLength(length);
-    position += skipLength;
-    return skipLength;
-  }
-
-  @Override
-  public int read(byte[] buffer, int offset, int length) {
-    if (isEndOfStream()) {
-      return -1;
+    public ByteArrayNonBlockingInputStream(byte[] data)
+    {
+        this.data = Assertions.checkNotNull(data);
     }
-    int readLength = getReadLength(length);
-    System.arraycopy(data, position, buffer, offset, readLength);
-    position += readLength;
-    return readLength;
-  }
 
-  @Override
-  public int read(ByteBuffer buffer, int length) {
-    if (isEndOfStream()) {
-      return -1;
+    @Override
+    public int skip(int length)
+    {
+        int skipLength = getReadLength(length);
+        position += skipLength;
+        return skipLength;
     }
-    int readLength = getReadLength(length);
-    buffer.put(data, position, readLength);
-    position += readLength;
-    return readLength;
-  }
 
-  @Override
-  public long getAvailableByteCount() {
-    return data.length - position;
-  }
+    @Override
+    public int read(byte[] buffer, int offset, int length)
+    {
+        if (isEndOfStream())
+        {
+            return -1;
+        }
+        int readLength = getReadLength(length);
+        System.arraycopy(data, position, buffer, offset, readLength);
+        position += readLength;
+        return readLength;
+    }
 
-  @Override
-  public boolean isEndOfStream() {
-    return position == data.length;
-  }
+    @Override
+    public int read(ByteBuffer buffer, int length)
+    {
+        if (isEndOfStream())
+        {
+            return -1;
+        }
+        int readLength = getReadLength(length);
+        buffer.put(data, position, readLength);
+        position += readLength;
+        return readLength;
+    }
 
-  @Override
-  public void close() {
-    // Do nothing.
-  }
+    @Override
+    public long getAvailableByteCount()
+    {
+        return data.length - position;
+    }
 
-  private int getReadLength(int requestedLength) {
-    return Math.min(requestedLength, data.length - position);
-  }
+    @Override
+    public boolean isEndOfStream()
+    {
+        return position == data.length;
+    }
+
+    @Override
+    public void close()
+    {
+        // Do nothing.
+    }
+
+    private int getReadLength(int requestedLength)
+    {
+        return Math.min(requestedLength, data.length - position);
+    }
 
 }

@@ -20,49 +20,52 @@ import java.nio.ByteBuffer;
 /**
  * Holds sample data and corresponding metadata.
  */
-public final class SampleHolder {
+public final class SampleHolder
+{
 
-  /**
-   * Whether a {@link SampleSource} is permitted to replace {@link #data} if its current value is
-   * null or of insufficient size to hold the sample.
-   */
-  public final boolean allowDataBufferReplacement;
+    /**
+     * Whether a {@link SampleSource} is permitted to replace {@link #data} if
+     * its current value is null or of insufficient size to hold the sample.
+     */
+    public final boolean allowDataBufferReplacement;
 
-  public final CryptoInfo cryptoInfo;
+    public final CryptoInfo cryptoInfo;
 
-  /**
-   * A buffer holding the sample data.
-   */
-  public ByteBuffer data;
+    /**
+     * A buffer holding the sample data.
+     */
+    public ByteBuffer data;
 
-  /**
-   * The size of the sample in bytes.
-   */
-  public int size;
+    /**
+     * The size of the sample in bytes.
+     */
+    public int size;
 
-  /**
-   * Flags that accompany the sample. A combination of
-   * {@link android.media.MediaExtractor#SAMPLE_FLAG_SYNC} and
-   * {@link android.media.MediaExtractor#SAMPLE_FLAG_ENCRYPTED}
-   */
-  public int flags;
+    /**
+     * Flags that accompany the sample. A combination of
+     * {@link android.media.MediaExtractor#SAMPLE_FLAG_SYNC} and
+     * {@link android.media.MediaExtractor#SAMPLE_FLAG_ENCRYPTED}
+     */
+    public int flags;
 
-  /**
-   * The time at which the sample should be presented.
-   */
-  public long timeUs;
+    /**
+     * The time at which the sample should be presented.
+     */
+    public long timeUs;
 
-  /**
-   * If true then the sample should be decoded, but should not be presented.
-   */
-  public boolean decodeOnly;
+    /**
+     * If true then the sample should be decoded, but should not be presented.
+     */
+    public boolean decodeOnly;
 
-  /**
-   * @param allowDataBufferReplacement See {@link #allowDataBufferReplacement}.
-   */
-  public SampleHolder(boolean allowDataBufferReplacement) {
-    this.cryptoInfo = new CryptoInfo();
-    this.allowDataBufferReplacement = allowDataBufferReplacement;
-  }
+    /**
+     * @param allowDataBufferReplacement
+     *            See {@link #allowDataBufferReplacement}.
+     */
+    public SampleHolder(boolean allowDataBufferReplacement)
+    {
+        this.cryptoInfo = new CryptoInfo();
+        this.allowDataBufferReplacement = allowDataBufferReplacement;
+    }
 
 }

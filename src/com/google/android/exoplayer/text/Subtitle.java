@@ -18,55 +18,62 @@ package com.google.android.exoplayer.text;
 /**
  * A subtitle that contains textual data associated with time indices.
  */
-public interface Subtitle {
+public interface Subtitle
+{
 
-  /**
-   * Gets the start time of the subtitle.
-   * <p>
-   * Note that the value returned may be less than {@code getEventTime(0)}, since a subtitle may
-   * begin prior to the time of the first event.
-   *
-   * @return The start time of the subtitle in microseconds.
-   */
-  public long getStartTime();
+    /**
+     * Gets the start time of the subtitle.
+     * <p>
+     * Note that the value returned may be less than {@code getEventTime(0)},
+     * since a subtitle may begin prior to the time of the first event.
+     *
+     * @return The start time of the subtitle in microseconds.
+     */
+    public long getStartTime();
 
-  /**
-   * Gets the index of the first event that occurs after a given time (exclusive).
-   *
-   * @param timeUs The time in microseconds.
-   * @return The index of the next event, or -1 if there are no events after the specified time.
-   */
-  public int getNextEventTimeIndex(long timeUs);
+    /**
+     * Gets the index of the first event that occurs after a given time
+     * (exclusive).
+     *
+     * @param timeUs
+     *            The time in microseconds.
+     * @return The index of the next event, or -1 if there are no events after
+     *         the specified time.
+     */
+    public int getNextEventTimeIndex(long timeUs);
 
-  /**
-   * Gets the number of event times, where events are defined as points in time at which the text
-   * returned by {@link #getText(long)} changes.
-   *
-   * @return The number of event times.
-   */
-  public int getEventTimeCount();
+    /**
+     * Gets the number of event times, where events are defined as points in
+     * time at which the text returned by {@link #getText(long)} changes.
+     *
+     * @return The number of event times.
+     */
+    public int getEventTimeCount();
 
-  /**
-   * Gets the event time at a specified index.
-   *
-   * @param index The index of the event time to obtain.
-   * @return The event time in microseconds.
-   */
-  public long getEventTime(int index);
+    /**
+     * Gets the event time at a specified index.
+     *
+     * @param index
+     *            The index of the event time to obtain.
+     * @return The event time in microseconds.
+     */
+    public long getEventTime(int index);
 
-  /**
-   * Convenience method for obtaining the last event time.
-   *
-   * @return The time of the last event in microseconds, or -1 if {@code getEventTimeCount() == 0}.
-   */
-  public long getLastEventTime();
+    /**
+     * Convenience method for obtaining the last event time.
+     *
+     * @return The time of the last event in microseconds, or -1 if
+     *         {@code getEventTimeCount() == 0}.
+     */
+    public long getLastEventTime();
 
-  /**
-   * Retrieve the subtitle text that should be displayed at a given time.
-   *
-   * @param timeUs The time in microseconds.
-   * @return The text that should be displayed, or null.
-   */
-  public String getText(long timeUs);
+    /**
+     * Retrieve the subtitle text that should be displayed at a given time.
+     *
+     * @param timeUs
+     *            The time in microseconds.
+     * @return The text that should be displayed, or null.
+     */
+    public String getText(long timeUs);
 
 }

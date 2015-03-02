@@ -28,164 +28,195 @@ import com.google.android.exoplayer.util.Assertions;
 import java.io.IOException;
 
 /**
- * An abstract base class for {@link Loadable} implementations that load chunks of data required
- * for the playback of streams.
+ * An abstract base class for {@link Loadable} implementations that load chunks
+ * of data required for the playback of streams.
  */
-public abstract class Chunk implements Loadable {
+public abstract class Chunk implements Loadable
+{
 
-  /**
-   * The format associated with the data being loaded.
-   */
-  // TODO: Consider removing this and pushing it down into MediaChunk instead.
-  public final Format format;
-  /**
-   * The reason for a {@link ChunkSource} having generated this chunk. For reporting only. Possible
-   * values for this variable are defined by the specific {@link ChunkSource} implementations.
-   */
-  public final int trigger;
+    /**
+     * The format associated with the data being loaded.
+     */
+    // TODO: Consider removing this and pushing it down into MediaChunk instead.
+    public final Format format;
+    /**
+     * The reason for a {@link ChunkSource} having generated this chunk. For
+     * reporting only. Possible values for this variable are defined by the
+     * specific {@link ChunkSource} implementations.
+     */
+    public final int trigger;
 
-  private final DataSource dataSource;
-  private final DataSpec dataSpec;
+    private final DataSource dataSource;
+    private final DataSpec dataSpec;
 
-  private DataSourceStream dataSourceStream;
+    private DataSourceStream dataSourceStream;
 
-  /**
-   * @param dataSource The source from which the data should be loaded.
-   * @param dataSpec Defines the data to be loaded. {@code dataSpec.length} must not exceed
-   *     {@link Integer#MAX_VALUE}. If {@code dataSpec.length == C.LENGTH_UNBOUNDED} then
-   *     the length resolved by {@code dataSource.open(dataSpec)} must not exceed
-   *     {@link Integer#MAX_VALUE}.
-   * @param format See {@link #format}.
-   * @param trigger See {@link #trigger}.
-   */
-  public Chunk(DataSource dataSource, DataSpec dataSpec, Format format, int trigger) {
-    Assertions.checkState(dataSpec.length <= Integer.MAX_VALUE);
-    this.dataSource = Assertions.checkNotNull(dataSource);
-    this.dataSpec = Assertions.checkNotNull(dataSpec);
-    this.format = Assertions.checkNotNull(format);
-    this.trigger = trigger;
-  }
-
-  /**
-   * Initializes the {@link Chunk}.
-   *
-   * @param allocator An {@link Allocator} from which the {@link Allocation} needed to contain the
-   *     data can be obtained.
-   */
-  public final void init(Allocator allocator) {
-    Assertions.checkState(dataSourceStream == null);
-    dataSourceStream = new DataSourceStream(dataSource, dataSpec, allocator);
-  }
-
-  /**
-   * Releases the {@link Chunk}, releasing any backing {@link Allocation}s.
-   */
-  public final void release() {
-    if (dataSourceStream != null) {
-      dataSourceStream.close();
-      dataSourceStream = null;
+    /**
+     * @param dataSource
+     *            The source from which the data should be loaded.
+     * @param dataSpec
+     *            Defines the data to be loaded. {@code dataSpec.length} must
+     *            not exceed {@link Integer#MAX_VALUE}. If
+     *            {@code dataSpec.length == C.LENGTH_UNBOUNDED} then the length
+     *            resolved by {@code dataSource.open(dataSpec)} must not exceed
+     *            {@link Integer#MAX_VALUE}.
+     * @param format
+     *            See {@link #format}.
+     * @param trigger
+     *            See {@link #trigger}.
+     */
+    public Chunk(DataSource dataSource, DataSpec dataSpec, Format format, int trigger)
+    {
+        Assertions.checkState(dataSpec.length <= Integer.MAX_VALUE);
+        this.dataSource = Assertions.checkNotNull(dataSource);
+        this.dataSpec = Assertions.checkNotNull(dataSpec);
+        this.format = Assertions.checkNotNull(format);
+        this.trigger = trigger;
     }
-  }
 
-  /**
-   * Gets the length of the chunk in bytes.
-   *
-   * @return The length of the chunk in bytes, or {@link C#LENGTH_UNBOUNDED} if the length has yet
-   *     to be determined.
-   */
-  public final long getLength() {
-    return dataSourceStream.getLength();
-  }
-
-  /**
-   * Whether the whole of the data has been consumed.
-   *
-   * @return True if the whole of the data has been consumed. False otherwise.
-   */
-  public final boolean isReadFinished() {
-    return dataSourceStream.isEndOfStream();
-  }
-
-  /**
-   * Whether the whole of the chunk has been loaded.
-   *
-   * @return True if the whole of the chunk has been loaded. False otherwise.
-   */
-  public final boolean isLoadFinished() {
-    return dataSourceStream.isLoadFinished();
-  }
-
-  /**
-   * Gets the number of bytes that have been loaded.
-   *
-   * @return The number of bytes that have been loaded.
-   */
-  public final long bytesLoaded() {
-    return dataSourceStream.getLoadPosition();
-  }
-
-  /**
-   * Causes loaded data to be consumed.
-   *
-   * @throws IOException If an error occurs consuming the loaded data.
-   */
-  public final void consume() throws IOException {
-    Assertions.checkState(dataSourceStream != null);
-    consumeStream(dataSourceStream);
-  }
-
-  /**
-   * Returns a byte array containing the loaded data. If the chunk is partially loaded, this
-   * method returns the data that has been loaded so far. If nothing has been loaded, null is
-   * returned.
-   *
-   * @return The loaded data or null.
-   */
-  public final byte[] getLoadedData() {
-    Assertions.checkState(dataSourceStream != null);
-    return dataSourceStream.getLoadedData();
-  }
-
-  /**
-   * Invoked by {@link #consume()}. Implementations may override this method if they wish to
-   * consume the loaded data at this point.
-   * <p>
-   * The default implementation is a no-op.
-   *
-   * @param stream The stream of loaded data.
-   * @throws IOException If an error occurs consuming the loaded data.
-   */
-  protected void consumeStream(NonBlockingInputStream stream) throws IOException {
-    // Do nothing.
-  }
-
-  protected final NonBlockingInputStream getNonBlockingInputStream() {
-    return dataSourceStream;
-  }
-
-  protected final void resetReadPosition() {
-    if (dataSourceStream != null) {
-      dataSourceStream.resetReadPosition();
-    } else {
-      // We haven't been initialized yet, so the read position must already be 0.
+    /**
+     * Initializes the {@link Chunk}.
+     *
+     * @param allocator
+     *            An {@link Allocator} from which the {@link Allocation} needed
+     *            to contain the data can be obtained.
+     */
+    public final void init(Allocator allocator)
+    {
+        Assertions.checkState(dataSourceStream == null);
+        dataSourceStream = new DataSourceStream(dataSource, dataSpec, allocator);
     }
-  }
 
-  // Loadable implementation
+    /**
+     * Releases the {@link Chunk}, releasing any backing {@link Allocation}s.
+     */
+    public final void release()
+    {
+        if (dataSourceStream != null)
+        {
+            dataSourceStream.close();
+            dataSourceStream = null;
+        }
+    }
 
-  @Override
-  public final void cancelLoad() {
-    dataSourceStream.cancelLoad();
-  }
+    /**
+     * Gets the length of the chunk in bytes.
+     *
+     * @return The length of the chunk in bytes, or {@link C#LENGTH_UNBOUNDED}
+     *         if the length has yet to be determined.
+     */
+    public final long getLength()
+    {
+        return dataSourceStream.getLength();
+    }
 
-  @Override
-  public final boolean isLoadCanceled() {
-    return dataSourceStream.isLoadCanceled();
-  }
+    /**
+     * Whether the whole of the data has been consumed.
+     *
+     * @return True if the whole of the data has been consumed. False otherwise.
+     */
+    public final boolean isReadFinished()
+    {
+        return dataSourceStream.isEndOfStream();
+    }
 
-  @Override
-  public final void load() throws IOException, InterruptedException {
-    dataSourceStream.load();
-  }
+    /**
+     * Whether the whole of the chunk has been loaded.
+     *
+     * @return True if the whole of the chunk has been loaded. False otherwise.
+     */
+    public final boolean isLoadFinished()
+    {
+        return dataSourceStream.isLoadFinished();
+    }
+
+    /**
+     * Gets the number of bytes that have been loaded.
+     *
+     * @return The number of bytes that have been loaded.
+     */
+    public final long bytesLoaded()
+    {
+        return dataSourceStream.getLoadPosition();
+    }
+
+    /**
+     * Causes loaded data to be consumed.
+     *
+     * @throws IOException
+     *             If an error occurs consuming the loaded data.
+     */
+    public final void consume() throws IOException
+    {
+        Assertions.checkState(dataSourceStream != null);
+        consumeStream(dataSourceStream);
+    }
+
+    /**
+     * Returns a byte array containing the loaded data. If the chunk is
+     * partially loaded, this method returns the data that has been loaded so
+     * far. If nothing has been loaded, null is returned.
+     *
+     * @return The loaded data or null.
+     */
+    public final byte[] getLoadedData()
+    {
+        Assertions.checkState(dataSourceStream != null);
+        return dataSourceStream.getLoadedData();
+    }
+
+    /**
+     * Invoked by {@link #consume()}. Implementations may override this method
+     * if they wish to consume the loaded data at this point.
+     * <p>
+     * The default implementation is a no-op.
+     *
+     * @param stream
+     *            The stream of loaded data.
+     * @throws IOException
+     *             If an error occurs consuming the loaded data.
+     */
+    protected void consumeStream(NonBlockingInputStream stream) throws IOException
+    {
+        // Do nothing.
+    }
+
+    protected final NonBlockingInputStream getNonBlockingInputStream()
+    {
+        return dataSourceStream;
+    }
+
+    protected final void resetReadPosition()
+    {
+        if (dataSourceStream != null)
+        {
+            dataSourceStream.resetReadPosition();
+        }
+        else
+        {
+            // We haven't been initialized yet, so the read position must
+            // already be 0.
+        }
+    }
+
+    // Loadable implementation
+
+    @Override
+    public final void cancelLoad()
+    {
+        dataSourceStream.cancelLoad();
+    }
+
+    @Override
+    public final boolean isLoadCanceled()
+    {
+        return dataSourceStream.isLoadCanceled();
+    }
+
+    @Override
+    public final void load() throws IOException, InterruptedException
+    {
+        dataSourceStream.load();
+    }
 
 }

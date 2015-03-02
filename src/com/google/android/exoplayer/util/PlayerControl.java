@@ -20,83 +20,100 @@ import com.google.android.exoplayer.ExoPlayer;
 import android.widget.MediaController.MediaPlayerControl;
 
 /**
- * An implementation of {@link MediaPlayerControl} for controlling an {@link ExoPlayer} instance.
+ * An implementation of {@link MediaPlayerControl} for controlling an
+ * {@link ExoPlayer} instance.
  * <p>
- * This class is provided for convenience, however it is expected that most applications will
- * implement their own player controls and therefore not require this class.
+ * This class is provided for convenience, however it is expected that most
+ * applications will implement their own player controls and therefore not
+ * require this class.
  */
-public class PlayerControl implements MediaPlayerControl {
+public class PlayerControl implements MediaPlayerControl
+{
 
-  private final ExoPlayer exoPlayer;
+    private final ExoPlayer exoPlayer;
 
-  public PlayerControl(ExoPlayer exoPlayer) {
-    this.exoPlayer = exoPlayer;
-  }
+    public PlayerControl(ExoPlayer exoPlayer)
+    {
+        this.exoPlayer = exoPlayer;
+    }
 
-  @Override
-  public boolean canPause() {
-    return true;
-  }
+    @Override
+    public boolean canPause()
+    {
+        return true;
+    }
 
-  @Override
-  public boolean canSeekBackward() {
-    return true;
-  }
+    @Override
+    public boolean canSeekBackward()
+    {
+        return true;
+    }
 
-  @Override
-  public boolean canSeekForward() {
-    return true;
-  }
+    @Override
+    public boolean canSeekForward()
+    {
+        return true;
+    }
 
-  /**
-   * This is an unsupported operation.
-   * <p>
-   * Application of audio effects is dependent on the audio renderer used. When using
-   * {@link com.google.android.exoplayer.MediaCodecAudioTrackRenderer}, the recommended approach is
-   * to extend the class and override
-   * {@link com.google.android.exoplayer.MediaCodecAudioTrackRenderer#onAudioSessionId}.
-   *
-   * @throws UnsupportedOperationException Always thrown.
-   */
-  @Override
-  public int getAudioSessionId() {
-    throw new UnsupportedOperationException();
-  }
+    /**
+     * This is an unsupported operation.
+     * <p>
+     * Application of audio effects is dependent on the audio renderer used.
+     * When using
+     * {@link com.google.android.exoplayer.MediaCodecAudioTrackRenderer}, the
+     * recommended approach is to extend the class and override
+     * {@link com.google.android.exoplayer.MediaCodecAudioTrackRenderer#onAudioSessionId}.
+     *
+     * @throws UnsupportedOperationException
+     *             Always thrown.
+     */
+    @Override
+    public int getAudioSessionId()
+    {
+        throw new UnsupportedOperationException();
+    }
 
-  @Override
-  public int getBufferPercentage() {
-    return exoPlayer.getBufferedPercentage();
-  }
+    @Override
+    public int getBufferPercentage()
+    {
+        return exoPlayer.getBufferedPercentage();
+    }
 
-  @Override
-  public int getCurrentPosition() {
-    return exoPlayer.getCurrentPosition();
-  }
+    @Override
+    public int getCurrentPosition()
+    {
+        return exoPlayer.getCurrentPosition();
+    }
 
-  @Override
-  public int getDuration() {
-    return exoPlayer.getDuration();
-  }
+    @Override
+    public int getDuration()
+    {
+        return exoPlayer.getDuration();
+    }
 
-  @Override
-  public boolean isPlaying() {
-    return exoPlayer.getPlayWhenReady();
-  }
+    @Override
+    public boolean isPlaying()
+    {
+        return exoPlayer.getPlayWhenReady();
+    }
 
-  @Override
-  public void start() {
-    exoPlayer.setPlayWhenReady(true);
-  }
+    @Override
+    public void start()
+    {
+        exoPlayer.setPlayWhenReady(true);
+    }
 
-  @Override
-  public void pause() {
-    exoPlayer.setPlayWhenReady(false);
-  }
+    @Override
+    public void pause()
+    {
+        exoPlayer.setPlayWhenReady(false);
+    }
 
-  @Override
-  public void seekTo(int timeMillis) {
-    // MediaController arrow keys generate unbounded values.
-    exoPlayer.seekTo(Math.min(Math.max(0, timeMillis), getDuration()));
-  }
+    @Override
+    public void seekTo(int timeMillis)
+    {
+        // MediaController arrow keys generate unbounded values.
+        exoPlayer.seekTo(Math.min(Math.max(0, timeMillis), getDuration()));
+    }
 
 }

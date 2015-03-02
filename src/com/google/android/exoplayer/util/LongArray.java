@@ -20,58 +20,70 @@ import java.util.Arrays;
 /**
  * An append-only, auto-growing {@code long[]}.
  */
-public class LongArray {
+public class LongArray
+{
 
-  private static final int DEFAULT_INITIAL_CAPACITY = 32;
+    private static final int DEFAULT_INITIAL_CAPACITY = 32;
 
-  private int size;
-  private long[] values;
+    private int size;
+    private long[] values;
 
-  public LongArray() {
-    this(DEFAULT_INITIAL_CAPACITY);
-  }
-
-  /**
-   * @param initialCapacity The initial capacity of the array.
-   */
-  public LongArray(int initialCapacity) {
-    values = new long[initialCapacity];
-  }
-
-  /**
-   * Appends a value.
-   *
-   * @param value The value to append.
-   */
-  public void add(long value) {
-    if (size == values.length) {
-      values = Arrays.copyOf(values, size * 2);
+    public LongArray()
+    {
+        this(DEFAULT_INITIAL_CAPACITY);
     }
-    values[size++] = value;
-  }
 
-  /**
-   * Gets a value.
-   *
-   * @param index The index.
-   * @return The corresponding value.
-   * @throws IndexOutOfBoundsException If the index is less than zero, or greater than or equal to
-   *     {@link #size()}
-   */
-  public long get(int index) {
-    if (index < 0 || index >= size) {
-      throw new IndexOutOfBoundsException("Invalid size " + index + ", size is " + size);
+    /**
+     * @param initialCapacity
+     *            The initial capacity of the array.
+     */
+    public LongArray(int initialCapacity)
+    {
+        values = new long[initialCapacity];
     }
-    return values[index];
-  }
 
-  /**
-   * Gets the current size of the array.
-   *
-   * @return The current size of the array.
-   */
-  public int size() {
-    return size;
-  }
+    /**
+     * Appends a value.
+     *
+     * @param value
+     *            The value to append.
+     */
+    public void add(long value)
+    {
+        if (size == values.length)
+        {
+            values = Arrays.copyOf(values, size * 2);
+        }
+        values[size++] = value;
+    }
+
+    /**
+     * Gets a value.
+     *
+     * @param index
+     *            The index.
+     * @return The corresponding value.
+     * @throws IndexOutOfBoundsException
+     *             If the index is less than zero, or greater than or equal to
+     *             {@link #size()}
+     */
+    public long get(int index)
+    {
+        if (index < 0 || index >= size)
+        {
+            throw new IndexOutOfBoundsException("Invalid size " + index + ", size is " + size);
+        }
+        return values[index];
+    }
+
+    /**
+     * Gets the current size of the array.
+     *
+     * @return The current size of the array.
+     */
+    public int size()
+    {
+        return size;
+    }
 
 }

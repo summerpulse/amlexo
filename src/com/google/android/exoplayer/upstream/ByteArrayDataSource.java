@@ -23,40 +23,47 @@ import java.io.IOException;
 /**
  * A {@link DataSource} for reading from a byte array.
  */
-public class ByteArrayDataSource implements DataSource {
+public class ByteArrayDataSource implements DataSource
+{
 
-  private final byte[] data;
-  private int readPosition;
+    private final byte[] data;
+    private int readPosition;
 
-  /**
-   * @param data The data to be read.
-   */
-  public ByteArrayDataSource(byte[] data) {
-    this.data = Assertions.checkNotNull(data);
-  }
-
-  @Override
-  public long open(DataSpec dataSpec) throws IOException {
-    if (dataSpec.length == C.LENGTH_UNBOUNDED) {
-      Assertions.checkArgument(dataSpec.position < data.length);
-    } else {
-      Assertions.checkArgument(dataSpec.position + dataSpec.length <= data.length);
+    /**
+     * @param data
+     *            The data to be read.
+     */
+    public ByteArrayDataSource(byte[] data)
+    {
+        this.data = Assertions.checkNotNull(data);
     }
-    readPosition = (int) dataSpec.position;
-    return (dataSpec.length == C.LENGTH_UNBOUNDED) ? (data.length - dataSpec.position)
-        : dataSpec.length;
-  }
 
-  @Override
-  public void close() throws IOException {
-    // Do nothing.
-  }
+    @Override
+    public long open(DataSpec dataSpec) throws IOException
+    {
+        if (dataSpec.length == C.LENGTH_UNBOUNDED)
+        {
+            Assertions.checkArgument(dataSpec.position < data.length);
+        }
+        else
+        {
+            Assertions.checkArgument(dataSpec.position + dataSpec.length <= data.length);
+        }
+        readPosition = (int) dataSpec.position;
+        return (dataSpec.length == C.LENGTH_UNBOUNDED) ? (data.length - dataSpec.position) : dataSpec.length;
+    }
 
-  @Override
-  public int read(byte[] buffer, int offset, int length) throws IOException {
-    System.arraycopy(data, readPosition, buffer, offset, length);
-    readPosition += length;
-    return length;
-  }
+    @Override
+    public void close() throws IOException
+    {
+        // Do nothing.
+    }
+
+    @Override
+    public int read(byte[] buffer, int offset, int length) throws IOException
+    {
+        System.arraycopy(data, readPosition, buffer, offset, length);
+        readPosition += length;
+        return length;
+    }
 }
-

@@ -30,70 +30,88 @@ import java.util.UUID;
 /**
  * A WebM {@link MediaChunk}.
  */
-public final class WebmMediaChunk extends MediaChunk {
+public final class WebmMediaChunk extends MediaChunk
+{
 
-  private final WebmExtractor extractor;
+    private final WebmExtractor extractor;
 
-  /**
-   * @param dataSource A {@link DataSource} for loading the data.
-   * @param dataSpec Defines the data to be loaded.
-   * @param format The format of the stream to which this chunk belongs.
-   * @param extractor The extractor that will be used to extract the samples.
-   * @param trigger The reason for this chunk being selected.
-   * @param startTimeUs The start time of the media contained by the chunk, in microseconds.
-   * @param endTimeUs The end time of the media contained by the chunk, in microseconds.
-   * @param nextChunkIndex The index of the next chunk, or -1 if this is the last chunk.
-   */
-  public WebmMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format,
-      int trigger, WebmExtractor extractor, long startTimeUs, long endTimeUs,
-      int nextChunkIndex) {
-    super(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex);
-    this.extractor = extractor;
-  }
-
-  @Override
-  public void seekToStart() {
-    seekTo(0, false);
-  }
-
-  @Override
-  public boolean seekTo(long positionUs, boolean allowNoop) {
-    boolean isDiscontinuous = extractor.seekTo(positionUs, allowNoop);
-    if (isDiscontinuous) {
-      resetReadPosition();
+    /**
+     * @param dataSource
+     *            A {@link DataSource} for loading the data.
+     * @param dataSpec
+     *            Defines the data to be loaded.
+     * @param format
+     *            The format of the stream to which this chunk belongs.
+     * @param extractor
+     *            The extractor that will be used to extract the samples.
+     * @param trigger
+     *            The reason for this chunk being selected.
+     * @param startTimeUs
+     *            The start time of the media contained by the chunk, in
+     *            microseconds.
+     * @param endTimeUs
+     *            The end time of the media contained by the chunk, in
+     *            microseconds.
+     * @param nextChunkIndex
+     *            The index of the next chunk, or -1 if this is the last chunk.
+     */
+    public WebmMediaChunk(DataSource dataSource, DataSpec dataSpec, Format format, int trigger, WebmExtractor extractor, long startTimeUs, long endTimeUs, int nextChunkIndex)
+    {
+        super(dataSource, dataSpec, format, trigger, startTimeUs, endTimeUs, nextChunkIndex);
+        this.extractor = extractor;
     }
-    return isDiscontinuous;
-  }
 
-  @Override
-  public boolean prepare() {
-    return true;
-  }
+    @Override
+    public void seekToStart()
+    {
+        seekTo(0, false);
+    }
 
-  @Override
-  public boolean sampleAvailable() throws ParserException {
-    NonBlockingInputStream inputStream = getNonBlockingInputStream();
-    int result = extractor.read(inputStream, null);
-    return (result & WebmExtractor.RESULT_NEED_SAMPLE_HOLDER) != 0;
-  }
+    @Override
+    public boolean seekTo(long positionUs, boolean allowNoop)
+    {
+        boolean isDiscontinuous = extractor.seekTo(positionUs, allowNoop);
+        if (isDiscontinuous)
+        {
+            resetReadPosition();
+        }
+        return isDiscontinuous;
+    }
 
-  @Override
-  public boolean read(SampleHolder holder) {
-    NonBlockingInputStream inputStream = getNonBlockingInputStream();
-    Assertions.checkState(inputStream != null);
-    int result = extractor.read(inputStream, holder);
-    return (result & WebmExtractor.RESULT_READ_SAMPLE) != 0;
-  }
+    @Override
+    public boolean prepare()
+    {
+        return true;
+    }
 
-  @Override
-  public MediaFormat getMediaFormat() {
-    return extractor.getFormat();
-  }
+    @Override
+    public boolean sampleAvailable() throws ParserException
+    {
+        NonBlockingInputStream inputStream = getNonBlockingInputStream();
+        int result = extractor.read(inputStream, null);
+        return (result & WebmExtractor.RESULT_NEED_SAMPLE_HOLDER) != 0;
+    }
 
-  @Override
-  public Map<UUID, byte[]> getPsshInfo() {
-    // TODO: Add support for Pssh to WebmExtractor
-    return null;
-  }
+    @Override
+    public boolean read(SampleHolder holder)
+    {
+        NonBlockingInputStream inputStream = getNonBlockingInputStream();
+        Assertions.checkState(inputStream != null);
+        int result = extractor.read(inputStream, holder);
+        return (result & WebmExtractor.RESULT_READ_SAMPLE) != 0;
+    }
+
+    @Override
+    public MediaFormat getMediaFormat()
+    {
+        return extractor.getFormat();
+    }
+
+    @Override
+    public Map<UUID, byte[]> getPsshInfo()
+    {
+        // TODO: Add support for Pssh to WebmExtractor
+        return null;
+    }
 
 }

@@ -18,62 +18,71 @@ package com.google.android.exoplayer;
 import android.os.SystemClock;
 
 /**
- * A simple clock for tracking the progression of media time. The clock can be started, stopped and
- * its time can be set and retrieved. When started, this clock is based on
- * {@link SystemClock#elapsedRealtime()}.
+ * A simple clock for tracking the progression of media time. The clock can be
+ * started, stopped and its time can be set and retrieved. When started, this
+ * clock is based on {@link SystemClock#elapsedRealtime()}.
  */
-/* package */ class MediaClock {
+/* package */class MediaClock
+{
 
-  private boolean started;
+    private boolean started;
 
-  /**
-   * The media time when the clock was last set or stopped.
-   */
-  private long timeUs;
+    /**
+     * The media time when the clock was last set or stopped.
+     */
+    private long timeUs;
 
-  /**
-   * The difference between {@link SystemClock#elapsedRealtime()} and {@link #timeUs}
-   * when the clock was last set or started.
-   */
-  private long deltaUs;
+    /**
+     * The difference between {@link SystemClock#elapsedRealtime()} and
+     * {@link #timeUs} when the clock was last set or started.
+     */
+    private long deltaUs;
 
-  /**
-   * Starts the clock. Does nothing if the clock is already started.
-   */
-  public void start() {
-    if (!started) {
-      started = true;
-      deltaUs = elapsedRealtimeMinus(timeUs);
+    /**
+     * Starts the clock. Does nothing if the clock is already started.
+     */
+    public void start()
+    {
+        if (!started)
+        {
+            started = true;
+            deltaUs = elapsedRealtimeMinus(timeUs);
+        }
     }
-  }
 
-  /**
-   * Stops the clock. Does nothing if the clock is already stopped.
-   */
-  public void stop() {
-    if (started) {
-      timeUs = elapsedRealtimeMinus(deltaUs);
-      started = false;
+    /**
+     * Stops the clock. Does nothing if the clock is already stopped.
+     */
+    public void stop()
+    {
+        if (started)
+        {
+            timeUs = elapsedRealtimeMinus(deltaUs);
+            started = false;
+        }
     }
-  }
 
-  /**
-   * @param timeUs The time to set in microseconds.
-   */
-  public void setTimeUs(long timeUs) {
-    this.timeUs = timeUs;
-    deltaUs = elapsedRealtimeMinus(timeUs);
-  }
+    /**
+     * @param timeUs
+     *            The time to set in microseconds.
+     */
+    public void setTimeUs(long timeUs)
+    {
+        this.timeUs = timeUs;
+        deltaUs = elapsedRealtimeMinus(timeUs);
+    }
 
-  /**
-   * @return The current time in microseconds.
-   */
-  public long getTimeUs() {
-    return started ? elapsedRealtimeMinus(deltaUs) : timeUs;
-  }
+    /**
+     * @return The current time in microseconds.
+     */
+    public long getTimeUs()
+    {
+        return started ? elapsedRealtimeMinus(deltaUs) : timeUs;
+    }
 
-  private long elapsedRealtimeMinus(long microSeconds) {
-    return SystemClock.elapsedRealtime() * 1000 - microSeconds;
-  }
+    private long elapsedRealtimeMinus(long microSeconds)
+    {
+        return SystemClock.elapsedRealtime() * 1000 - microSeconds;
+    }
 
 }

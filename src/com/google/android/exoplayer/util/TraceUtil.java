@@ -22,38 +22,47 @@ import android.annotation.TargetApi;
 /**
  * Calls through to {@link android.os.Trace} methods on supported API levels.
  */
-public class TraceUtil {
+public class TraceUtil
+{
 
-  /**
-   * Writes a trace message to indicate that a given section of code has begun.
-   *
-   * @see android.os.Trace#beginSection(String)
-   */
-  public static void beginSection(String sectionName) {
-    if (ExoPlayerLibraryInfo.TRACE_ENABLED && Util.SDK_INT >= 18) {
-      beginSectionV18(sectionName);
+    /**
+     * Writes a trace message to indicate that a given section of code has
+     * begun.
+     *
+     * @see android.os.Trace#beginSection(String)
+     */
+    public static void beginSection(String sectionName)
+    {
+        if (ExoPlayerLibraryInfo.TRACE_ENABLED && Util.SDK_INT >= 18)
+        {
+            beginSectionV18(sectionName);
+        }
     }
-  }
 
-  /**
-   * Writes a trace message to indicate that a given section of code has ended.
-   *
-   * @see android.os.Trace#endSection()
-   */
-  public static void endSection() {
-    if (ExoPlayerLibraryInfo.TRACE_ENABLED && Util.SDK_INT >= 18) {
-      endSectionV18();
+    /**
+     * Writes a trace message to indicate that a given section of code has
+     * ended.
+     *
+     * @see android.os.Trace#endSection()
+     */
+    public static void endSection()
+    {
+        if (ExoPlayerLibraryInfo.TRACE_ENABLED && Util.SDK_INT >= 18)
+        {
+            endSectionV18();
+        }
     }
-  }
 
-  @TargetApi(18)
-  private static void beginSectionV18(String sectionName) {
-    android.os.Trace.beginSection(sectionName);
-  }
+    @TargetApi(18)
+    private static void beginSectionV18(String sectionName)
+    {
+        android.os.Trace.beginSection(sectionName);
+    }
 
-  @TargetApi(18)
-  private static void endSectionV18() {
-    android.os.Trace.endSection();
-  }
+    @TargetApi(18)
+    private static void endSectionV18()
+    {
+        android.os.Trace.endSection();
+    }
 
 }

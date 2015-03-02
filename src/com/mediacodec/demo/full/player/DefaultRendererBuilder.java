@@ -31,39 +31,37 @@ import android.widget.TextView;
  * A {@link RendererBuilder} for streams that can be read using
  * {@link android.media.MediaExtractor}.
  */
-public class DefaultRendererBuilder implements RendererBuilder {
+public class DefaultRendererBuilder implements RendererBuilder
+{
 
-  private final Context context;
-  private final Uri uri;
-  private final TextView debugTextView;
+    private final Context context;
+    private final Uri uri;
+    private final TextView debugTextView;
 
-  public DefaultRendererBuilder(Context context, Uri uri, TextView debugTextView) {
-    this.context = context;
-    this.uri = uri;
-    this.debugTextView = debugTextView;
-  }
+    public DefaultRendererBuilder(Context context, Uri uri, TextView debugTextView)
+    {
+        this.context = context;
+        this.uri = uri;
+        this.debugTextView = debugTextView;
+    }
 
-  @Override
-  public void buildRenderers(DemoPlayer player, RendererBuilderCallback callback) {
-    // Build the video and audio renderers.
-    FrameworkSampleSource sampleSource = new FrameworkSampleSource(context, uri, null, 2);
-    MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(sampleSource,
-        null, true, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000,
-        player.getMainHandler(), player, 50);
-    MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource,
-        null, true, player.getMainHandler(), player);
+    @Override
+    public void buildRenderers(DemoPlayer player, RendererBuilderCallback callback)
+    {
+        // Build the video and audio renderers.
+        FrameworkSampleSource sampleSource = new FrameworkSampleSource(context, uri, null, 2);
+        MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(sampleSource, null, true, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 5000, player.getMainHandler(), player, 50);
+        MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource, null, true, player.getMainHandler(), player);
 
-    // Build the debug renderer.
-    TrackRenderer debugRenderer = debugTextView != null
-        ? new DebugTrackRenderer(debugTextView, videoRenderer)
-        : null;
+        // Build the debug renderer.
+        TrackRenderer debugRenderer = debugTextView != null ? new DebugTrackRenderer(debugTextView, videoRenderer) : null;
 
-    // Invoke the callback.
-    TrackRenderer[] renderers = new TrackRenderer[DemoPlayer.RENDERER_COUNT];
-    renderers[DemoPlayer.TYPE_VIDEO] = videoRenderer;
-    renderers[DemoPlayer.TYPE_AUDIO] = audioRenderer;
-    renderers[DemoPlayer.TYPE_DEBUG] = debugRenderer;
-    callback.onRenderers(null, null, renderers);
-  }
+        // Invoke the callback.
+        TrackRenderer[] renderers = new TrackRenderer[DemoPlayer.RENDERER_COUNT];
+        renderers[DemoPlayer.TYPE_VIDEO] = videoRenderer;
+        renderers[DemoPlayer.TYPE_AUDIO] = audioRenderer;
+        renderers[DemoPlayer.TYPE_DEBUG] = debugRenderer;
+        callback.onRenderers(null, null, renderers);
+    }
 
 }

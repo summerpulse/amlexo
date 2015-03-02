@@ -18,41 +18,47 @@ package com.google.android.exoplayer;
 /**
  * Maintains codec event counts, for debugging purposes only.
  * <p>
- * Counters should be written from the playback thread only. Counters may be read from any thread.
- * To ensure that the counter values are correctly reflected between threads, users of this class
- * should invoke {@link #ensureUpdated()} prior to reading and after writing.
+ * Counters should be written from the playback thread only. Counters may be
+ * read from any thread. To ensure that the counter values are correctly
+ * reflected between threads, users of this class should invoke
+ * {@link #ensureUpdated()} prior to reading and after writing.
  */
-public final class CodecCounters {
+public final class CodecCounters
+{
 
-  public int codecInitCount;
-  public int codecReleaseCount;
-  public int outputFormatChangedCount;
-  public int outputBuffersChangedCount;
-  public int renderedOutputBufferCount;
-  public int skippedOutputBufferCount;
-  public int droppedOutputBufferCount;
+    public int codecInitCount;
+    public int codecReleaseCount;
+    public int outputFormatChangedCount;
+    public int outputBuffersChangedCount;
+    public int renderedOutputBufferCount;
+    public int skippedOutputBufferCount;
+    public int droppedOutputBufferCount;
 
-  /**
-   * Should be invoked from the playback thread after the counters have been updated. Should also
-   * be invoked from any other thread that wishes to read the counters, before reading. These calls
-   * ensure that counter updates are made visible to the reading threads.
-   */
-  public synchronized void ensureUpdated() {
-    // Do nothing. The use of synchronized ensures a memory barrier should another thread also
-    // call this method.
-  }
+    /**
+     * Should be invoked from the playback thread after the counters have been
+     * updated. Should also be invoked from any other thread that wishes to read
+     * the counters, before reading. These calls ensure that counter updates are
+     * made visible to the reading threads.
+     */
+    public synchronized void ensureUpdated()
+    {
+        // Do nothing. The use of synchronized ensures a memory barrier should
+        // another thread also
+        // call this method.
+    }
 
-  public String getDebugString() {
-    ensureUpdated();
-    StringBuilder builder = new StringBuilder();
-    builder.append("cic(").append(codecInitCount).append(")");
-    builder.append("crc(").append(codecReleaseCount).append(")");
-    builder.append("ofc(").append(outputFormatChangedCount).append(")");
-    builder.append("obc(").append(outputBuffersChangedCount).append(")");
-    builder.append("ren(").append(renderedOutputBufferCount).append(")");
-    builder.append("sob(").append(skippedOutputBufferCount).append(")");
-    builder.append("dob(").append(droppedOutputBufferCount).append(")");
-    return builder.toString();
-  }
+    public String getDebugString()
+    {
+        ensureUpdated();
+        StringBuilder builder = new StringBuilder();
+        builder.append("cic(").append(codecInitCount).append(")");
+        builder.append("crc(").append(codecReleaseCount).append(")");
+        builder.append("ofc(").append(outputFormatChangedCount).append(")");
+        builder.append("obc(").append(outputBuffersChangedCount).append(")");
+        builder.append("ren(").append(renderedOutputBufferCount).append(")");
+        builder.append("sob(").append(skippedOutputBufferCount).append(")");
+        builder.append("dob(").append(droppedOutputBufferCount).append(")");
+        return builder.toString();
+    }
 
 }

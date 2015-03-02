@@ -23,94 +23,107 @@ import android.media.MediaExtractor;
 /**
  * Compatibility wrapper around {@link android.media.MediaCodec.CryptoInfo}.
  */
-public class CryptoInfo {
+public class CryptoInfo
+{
 
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#iv
-   */
-  public byte[] iv;
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#key
-   */
-  public byte[] key;
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#mode
-   */
-  public int mode;
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#numBytesOfClearData
-   */
-  public int[] numBytesOfClearData;
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#numBytesOfEncryptedData
-   */
-  public int[] numBytesOfEncryptedData;
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#numSubSamples
-   */
-  public int numSubSamples;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#iv
+     */
+    public byte[] iv;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#key
+     */
+    public byte[] key;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#mode
+     */
+    public int mode;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#numBytesOfClearData
+     */
+    public int[] numBytesOfClearData;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#numBytesOfEncryptedData
+     */
+    public int[] numBytesOfEncryptedData;
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#numSubSamples
+     */
+    public int numSubSamples;
 
-  private final android.media.MediaCodec.CryptoInfo frameworkCryptoInfo;
+    private final android.media.MediaCodec.CryptoInfo frameworkCryptoInfo;
 
-  public CryptoInfo() {
-    frameworkCryptoInfo = Util.SDK_INT >= 16 ? newFrameworkCryptoInfoV16() : null;
-  }
-
-  /**
-   * @see android.media.MediaCodec.CryptoInfo#set(int, int[], int[], byte[], byte[], int)
-   */
-  public void set(int numSubSamples, int[] numBytesOfClearData, int[] numBytesOfEncryptedData,
-      byte[] key, byte[] iv, int mode) {
-    this.numSubSamples = numSubSamples;
-    this.numBytesOfClearData = numBytesOfClearData;
-    this.numBytesOfEncryptedData = numBytesOfEncryptedData;
-    this.key = key;
-    this.iv = iv;
-    this.mode = mode;
-    if (Util.SDK_INT >= 16) {
-      updateFrameworkCryptoInfoV16();
+    public CryptoInfo()
+    {
+        frameworkCryptoInfo = Util.SDK_INT >= 16 ? newFrameworkCryptoInfoV16() : null;
     }
-  }
 
-  /**
-   * Equivalent to {@link MediaExtractor#getSampleCryptoInfo(android.media.MediaCodec.CryptoInfo)}.
-   *
-   * @param extractor The extractor from which to retrieve the crypto information.
-   */
-  @TargetApi(16)
-  public void setFromExtractorV16(MediaExtractor extractor) {
-    extractor.getSampleCryptoInfo(frameworkCryptoInfo);
-    numSubSamples = frameworkCryptoInfo.numSubSamples;
-    numBytesOfClearData = frameworkCryptoInfo.numBytesOfClearData;
-    numBytesOfEncryptedData = frameworkCryptoInfo.numBytesOfEncryptedData;
-    key = frameworkCryptoInfo.key;
-    iv = frameworkCryptoInfo.iv;
-    mode = frameworkCryptoInfo.mode;
-  }
+    /**
+     * @see android.media.MediaCodec.CryptoInfo#set(int, int[], int[], byte[],
+     *      byte[], int)
+     */
+    public void set(int numSubSamples, int[] numBytesOfClearData, int[] numBytesOfEncryptedData, byte[] key, byte[] iv, int mode)
+    {
+        this.numSubSamples = numSubSamples;
+        this.numBytesOfClearData = numBytesOfClearData;
+        this.numBytesOfEncryptedData = numBytesOfEncryptedData;
+        this.key = key;
+        this.iv = iv;
+        this.mode = mode;
+        if (Util.SDK_INT >= 16)
+        {
+            updateFrameworkCryptoInfoV16();
+        }
+    }
 
-  /**
-   * Returns an equivalent {@link android.media.MediaCodec.CryptoInfo} instance.
-   * <p>
-   * Successive calls to this method on a single {@link CryptoInfo} will return the same instance.
-   * Changes to the {@link CryptoInfo} will be reflected in the returned object. The return object
-   * should not be modified directly.
-   *
-   * @return The equivalent {@link android.media.MediaCodec.CryptoInfo} instance.
-   */
-  @TargetApi(16)
-  public android.media.MediaCodec.CryptoInfo getFrameworkCryptoInfoV16() {
-    return frameworkCryptoInfo;
-  }
+    /**
+     * Equivalent to
+     * {@link MediaExtractor#getSampleCryptoInfo(android.media.MediaCodec.CryptoInfo)}
+     * .
+     *
+     * @param extractor
+     *            The extractor from which to retrieve the crypto information.
+     */
+    @TargetApi(16)
+    public void setFromExtractorV16(MediaExtractor extractor)
+    {
+        extractor.getSampleCryptoInfo(frameworkCryptoInfo);
+        numSubSamples = frameworkCryptoInfo.numSubSamples;
+        numBytesOfClearData = frameworkCryptoInfo.numBytesOfClearData;
+        numBytesOfEncryptedData = frameworkCryptoInfo.numBytesOfEncryptedData;
+        key = frameworkCryptoInfo.key;
+        iv = frameworkCryptoInfo.iv;
+        mode = frameworkCryptoInfo.mode;
+    }
 
-  @TargetApi(16)
-  private android.media.MediaCodec.CryptoInfo newFrameworkCryptoInfoV16() {
-    return new android.media.MediaCodec.CryptoInfo();
-  }
+    /**
+     * Returns an equivalent {@link android.media.MediaCodec.CryptoInfo}
+     * instance.
+     * <p>
+     * Successive calls to this method on a single {@link CryptoInfo} will
+     * return the same instance. Changes to the {@link CryptoInfo} will be
+     * reflected in the returned object. The return object should not be
+     * modified directly.
+     *
+     * @return The equivalent {@link android.media.MediaCodec.CryptoInfo}
+     *         instance.
+     */
+    @TargetApi(16)
+    public android.media.MediaCodec.CryptoInfo getFrameworkCryptoInfoV16()
+    {
+        return frameworkCryptoInfo;
+    }
 
-  @TargetApi(16)
-  private void updateFrameworkCryptoInfoV16() {
-    frameworkCryptoInfo.set(numSubSamples, numBytesOfClearData, numBytesOfEncryptedData, key, iv,
-        mode);
-  }
+    @TargetApi(16)
+    private android.media.MediaCodec.CryptoInfo newFrameworkCryptoInfoV16()
+    {
+        return new android.media.MediaCodec.CryptoInfo();
+    }
+
+    @TargetApi(16)
+    private void updateFrameworkCryptoInfoV16()
+    {
+        frameworkCryptoInfo.set(numSubSamples, numBytesOfClearData, numBytesOfEncryptedData, key, iv, mode);
+    }
 
 }
