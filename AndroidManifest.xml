@@ -25,7 +25,20 @@
         </intent-filter>
     </activity>
 
-    <activity android:name="com.mediacodec.demo.simple.SimplePlayerActivity" android:configChanges="keyboardHidden|orientation|screenSize" android:label="@string/application_name" android:theme="@style/PlayerTheme" android:enabled="true"/>
+    <activity android:name="com.mediacodec.demo.simple.SimplePlayerActivity"
+        android:configChanges="keyboardHidden|orientation|screenSize"
+        android:label="@string/application_name"
+        android:theme="@style/PlayerTheme"
+        android:enabled="true">
+        <intent-filter>
+			<action android:name="android.intent.action.VIEW"/>
+			<data android:mimeType="video/*" android:scheme="http"/>
+			<data android:mimeType="video/*" android:scheme="file"/>
+			<data android:mimeType="audio/*" android:scheme="http"/>
+			<data android:mimeType="audio/*" android:scheme="file"/>
+			<category android:name="android.intent.category.DEFAULT"/>
+		</intent-filter>
+    </activity>
     <activity android:name="com.mediacodec.demo.full.FullPlayerActivity"
         android:configChanges="keyboardHidden|orientation|screenSize"
         android:label="@string/application_name"
