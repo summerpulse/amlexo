@@ -5,7 +5,7 @@
     android:versionName="1.0">
 
     <supports-screens android:largeScreens="true" android:anyDensity="true"/>
-    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="19"/>
+    <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="19"/>
    
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
@@ -16,7 +16,7 @@
     
     <application android:icon="@drawable/icon" android:label="@string/app_name">
 
-    <activity android:name="com.meson.videoplayer2.FileList2"
+    <activity android:name="com.meson.videoplayer2.MainActivity"
         android:theme="@style/theme_trans"
         android:label="@string/app_name">
         <intent-filter>
