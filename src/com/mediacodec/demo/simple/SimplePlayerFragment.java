@@ -46,14 +46,14 @@ import android.widget.Toast;
 /**
  * An activity that plays media using {@link ExoPlayer}.
  */
-public class SimplePlayerActivityFragment extends Fragment implements SurfaceHolder.Callback, ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener
+public class SimplePlayerFragment extends Fragment implements SurfaceHolder.Callback, ExoPlayer.Listener, MediaCodecVideoTrackRenderer.EventListener
 {
     /**
      * Builds renderers for the player.
      */
-    public interface RendererBuilder
+    public interface RendererBuilderFragment
     {
-        void buildRenderers(RendererBuilderCallback callback);
+        void buildRenderers(RendererBuilderCallbackFragment callback);
     }
 
     public static final int RENDERER_COUNT = 2;
@@ -72,8 +72,8 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     private VideoSurfaceView surfaceView;
 
     private ExoPlayer player;
-    private RendererBuilder builder;
-    private RendererBuilderCallback callback;
+    private RendererBuilderFragment builder;
+    private RendererBuilderCallbackFragment callback;
     private MediaCodecVideoTrackRenderer videoRenderer;
 
     private boolean autoPlay = true;
@@ -82,26 +82,31 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     private Uri contentUri;
     private int contentType;
     private String contentId;
-    private final String LOG_TAG = "SimplePlayerActivity";
+    private final String LOG_TAG = "SimplePlayerFragment";
 
     // Activity lifecycle
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle saveInstanceState)
     {
-        Intent intent = this.getActivity().getIntent();
-        contentUri = intent.getData();
-        Log.d(LOG_TAG, "file path is:"+ contentUri.toString());
-        contentType = intent.getIntExtra(DemoUtil.CONTENT_TYPE_EXTRA, TYPE_OTHER);
-        contentId = intent.getStringExtra(DemoUtil.CONTENT_ID_EXTRA);
+        // Intent intent = this.getActivity().getIntent();
+        Log.d(LOG_TAG, "onCreateView");
+        contentUri = Uri.parse(getArguments().getString("video_file_path"));
 
+        Log.d(LOG_TAG, "file path is:" + contentUri.toString());
+
+        // contentType = intent.getIntExtra(DemoUtil.CONTENT_TYPE_EXTRA,
+        // TYPE_OTHER);
+        contentType = getArguments().getInt(DemoUtil.CONTENT_TYPE_EXTRA);
+        // contentId = intent.getStringExtra(DemoUtil.CONTENT_ID_EXTRA);
+        contentId = getArguments().getString(DemoUtil.CONTENT_ID_EXTRA);
         mainHandler = new Handler(this.getActivity().getMainLooper());
-//        builder = getRendererBuilder();
+        builder = getRendererBuilder();
 
-        //setContentView(R.layout.player_activity_simple);
-        View view  = inflater.inflate(R.layout.player_activity_simple, container, false);
+        // setContentView(R.layout.player_activity_simple);
+        View view = inflater.inflate(R.layout.player_activity_simple, container, false);
         View root = this.getActivity().findViewById(R.id.root);
-        root.setOnTouchListener(new OnTouchListener()
+        view.setOnTouchListener(new OnTouchListener()
         {
             @Override
             public boolean onTouch(View arg0, MotionEvent arg1)
@@ -115,10 +120,11 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
         });
 
         mediaController = new MediaController(this.getActivity());
-        mediaController.setAnchorView(root);
-        shutterView = this.getActivity().findViewById(R.id.shutter);
-        surfaceView = (VideoSurfaceView) this.getActivity().findViewById(R.id.surface_view);
+        mediaController.setAnchorView(view);
+        shutterView = view.findViewById(R.id.shutter);
+        surfaceView = (VideoSurfaceView)view.findViewById(R.id.surface_view);
         surfaceView.getHolder().addCallback(this);
+        Log.d(LOG_TAG, this.toString());
         return view;
     }
 
@@ -134,7 +140,7 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
         mediaController.setMediaPlayer(new PlayerControl(player));
         mediaController.setEnabled(true);
         // Request the renderers
-        callback = new RendererBuilderCallback();
+        callback = new RendererBuilderCallbackFragment();
         builder.buildRenderers(callback);
     }
 
@@ -165,6 +171,7 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
 
     private void toggleControlsVisibility()
     {
+        Log.d(LOG_TAG, "toggleControlsVisibility");
         if (mediaController.isShowing())
         {
             mediaController.hide();
@@ -175,8 +182,9 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
         }
     }
 
-//    private RendererBuilder getRendererBuilder()
-//    {
+    private RendererBuilderFragment getRendererBuilder()
+    {
+        Log.d(LOG_TAG, "RendererBuilderFragment::getRendererBuilder");
 //        String userAgent = DemoUtil.getUserAgent(this.getActivity());
 //        switch (contentType)
 //        {
@@ -185,12 +193,15 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
 //        case TYPE_DASH_VOD:
 //            return new DashVodRendererBuilder(this, userAgent, contentUri.toString(), contentId);
 //        default:
-//            return new DefaultRendererBuilder(this, contentUri);
+//            return new DefaultRendererBuilder(this.getActivity(), contentUri);
 //        }
-//    }
+        
+        return new DefaultRendererBuilderFragment(this, contentUri);
+    }
 
-    private void onRenderers(RendererBuilderCallback callback, MediaCodecVideoTrackRenderer videoRenderer, MediaCodecAudioTrackRenderer audioRenderer)
+    private void onRenderers(RendererBuilderCallbackFragment callback, MediaCodecVideoTrackRenderer videoRenderer, MediaCodecAudioTrackRenderer audioRenderer)
     {
+        Log.d(LOG_TAG," onRenderers");
         if (this.callback != callback)
         {
             return;
@@ -203,10 +214,17 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
 
     private void maybeStartPlayback()
     {
+        Log.d(LOG_TAG," maybeStartPlayback");
         Surface surface = surfaceView.getHolder().getSurface();
         if (videoRenderer == null || surface == null || !surface.isValid())
         {
-            // We're not ready yet.
+            Log.d(LOG_TAG," We're not ready yet.");
+            if (videoRenderer == null)
+                Log.d(LOG_TAG,"videoRenderer == null");
+            if (surface == null)
+                Log.d(LOG_TAG, "surface == null");
+            if(!surface.isValid())
+                Log.d(LOG_TAG, "surface.isValid()");
             return;
         }
         player.sendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, surface);
@@ -217,7 +235,7 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
         }
     }
 
-    private void onRenderersError(RendererBuilderCallback callback, Exception e)
+    private void onRenderersError(RendererBuilderCallbackFragment callback, Exception e)
     {
         if (this.callback != callback)
         {
@@ -235,18 +253,18 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     }
 
     // ExoPlayer.Listener implementation
-//
-//    @Override
-//    public void onPlayerStateChanged(boolean playWhenReady, int playbackState)
-//    {
-//        // Do nothing.
-//    }
-//
-//    @Override
-//    public void onPlayWhenReadyCommitted()
-//    {
-//        // Do nothing.
-//    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState)
+    {
+        // Do nothing.
+    }
+
+    @Override
+    public void onPlayWhenReadyCommitted()
+    {
+        // Do nothing.
+    }
 
     @Override
     public void onPlayerError(ExoPlaybackException e)
@@ -291,6 +309,7 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
+        Log.d(LOG_TAG, "surfaceCreated");
         maybeStartPlayback();
     }
 
@@ -303,6 +322,7 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     @Override
     public void surfaceDestroyed(SurfaceHolder holder)
     {
+        Log.d(LOG_TAG, "surfaceDestroyed");
         if (videoRenderer != null)
         {
             player.blockingSendMessage(videoRenderer, MediaCodecVideoTrackRenderer.MSG_SET_SURFACE, null);
@@ -310,33 +330,19 @@ public class SimplePlayerActivityFragment extends Fragment implements SurfaceHol
     }
 
     /* package */
-    final class RendererBuilderCallback
+    final class RendererBuilderCallbackFragment
     {
-
+        
         public void onRenderers(MediaCodecVideoTrackRenderer videoRenderer, MediaCodecAudioTrackRenderer audioRenderer)
         {
-            SimplePlayerActivityFragment.this.onRenderers(this, videoRenderer, audioRenderer);
+            SimplePlayerFragment.this.onRenderers(this, videoRenderer, audioRenderer);
         }
 
         public void onRenderersError(Exception e)
         {
-            SimplePlayerActivityFragment.this.onRenderersError(this, e);
+            SimplePlayerFragment.this.onRenderersError(this, e);
         }
 
-    }
-
-    @Override
-    public void onPlayerStateChanged(boolean playWhenReady, int playbackState)
-    {
-        // TODO Auto-generated method stub
-        
-    }
-
-    @Override
-    public void onPlayWhenReadyCommitted()
-    {
-        // TODO Auto-generated method stub
-        
     }
 
 }

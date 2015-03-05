@@ -15,6 +15,8 @@ import java.util.TimerTask;
 import com.mediacodec.demo.DemoUtil;
 import com.meson.videoplayer2.R;
 
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.app.ListActivity;
 import android.app.ListFragment;
 import android.content.BroadcastReceiver;
@@ -47,6 +49,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.mediacodec.demo.simple.SimplePlayerActivity;
+import com.mediacodec.demo.simple.SimplePlayerFragment;
 
 public class FileListFragment extends ListFragment
 {
@@ -847,7 +850,31 @@ public class FileListFragment extends ListFragment
                 intent.setData(Uri.parse(file.getAbsolutePath()));
                 intent.putExtra(DemoUtil.CONTENT_ID_EXTRA, "");
                 intent.putExtra(DemoUtil.CONTENT_TYPE_EXTRA, 2);
-                startActivity(intent);
+                Bundle bundle = new Bundle();
+                bundle.putString("video_file_path", file.getAbsolutePath());
+                bundle.putString(DemoUtil.CONTENT_ID_EXTRA, "");
+                bundle.putInt(DemoUtil.CONTENT_TYPE_EXTRA, 2);
+                
+//                startActivity(intent);
+                FragmentManager fm = getFragmentManager();
+                FragmentTransaction transaction = fm.beginTransaction();
+                SimplePlayerFragment video_fragment = new SimplePlayerFragment();
+                video_fragment.setArguments(bundle);
+                Log.d(LOG_TAG, "listview.id="+l.getId());
+                Log.d(LOG_TAG, "view.id="+v.getId());
+                Log.d(LOG_TAG, "this.getId()="+this.getId());
+                switch(this.getId())
+                {
+                case R.id.filelist1:
+                    transaction.replace(R.id.video1_container, video_fragment);
+                    break;
+                case R.id.filelist2:
+                    transaction.replace(R.id.video2_container, video_fragment);
+                    break;
+                default:
+                    Log.d(LOG_TAG, "why we are here?");
+                }
+                transaction.commit();
             }
     }
 

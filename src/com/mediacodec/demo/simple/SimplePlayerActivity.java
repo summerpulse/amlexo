@@ -178,10 +178,13 @@ public class SimplePlayerActivity extends Activity implements SurfaceHolder.Call
         switch (contentType)
         {
         case TYPE_SS_VOD:
+            Log.d(LOG_TAG, "TYPE_SS_VOD");
             return new SmoothStreamingRendererBuilder(this, userAgent, contentUri.toString(), contentId);
         case TYPE_DASH_VOD:
+            Log.d(LOG_TAG, "TYPE_DASH_VOD");
             return new DashVodRendererBuilder(this, userAgent, contentUri.toString(), contentId);
         default:
+            Log.d(LOG_TAG, "DEFAULT_RENDER");
             return new DefaultRendererBuilder(this, contentUri);
         }
     }
@@ -288,6 +291,7 @@ public class SimplePlayerActivity extends Activity implements SurfaceHolder.Call
     @Override
     public void surfaceCreated(SurfaceHolder holder)
     {
+        Log.d(LOG_TAG, "surfaceCreated");
         maybeStartPlayback();
     }
 

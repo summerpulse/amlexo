@@ -22,7 +22,7 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.Window;
 
-public class MainActivity extends Activity
+public class SimplePlayerFragmentActivity extends Activity
 // OnBufferingUpdateListener, OnCompletionListener, OnPreparedListener,
 // OnVideoSizeChangedListener,
 {
