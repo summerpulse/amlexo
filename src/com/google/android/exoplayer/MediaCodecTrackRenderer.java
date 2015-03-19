@@ -144,6 +144,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
     private boolean waitingForKeys;
     private boolean waitingForFirstSyncFrame;
     private long currentPositionUs;
+    private static final String LOG_TAG = "MediaCodecTrackRenderer";
 
     /**
      * @param source
@@ -443,6 +444,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
     @Override
     protected void doSomeWork(long timeUs) throws ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::doSomeWork");
         try
         {
             sourceIsReady = source.continueBuffering(timeUs);
@@ -482,6 +484,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
 
     private void readFormat() throws IOException, ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::readFormat");
         int result = source.readData(trackIndex, currentPositionUs, formatHolder, sampleHolder, false);
         if (result == SampleSource.FORMAT_READ)
         {
@@ -491,6 +494,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
 
     private void discardSamples(long timeUs) throws IOException, ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::discardSamples");
         sampleHolder.data = null;
         int result = SampleSource.SAMPLE_READ;
         while (result == SampleSource.SAMPLE_READ && currentPositionUs <= timeUs)
@@ -513,6 +517,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
 
     private void checkForDiscontinuity() throws IOException, ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::checkForDiscontinuity");
         if (codec == null)
         {
             return;
@@ -561,6 +566,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
      */
     private boolean feedInputBuffer() throws IOException, ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::feedInputBuffer");
         if (inputStreamEnded)
         {
             return false;

@@ -13,7 +13,7 @@ extern "C" {
 }
 
 #include "utils/log2.h"
-#define TAG "ExoPlayerLibJNI"
+#define TAG "FFIO"
 #define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
 #define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
 #define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)

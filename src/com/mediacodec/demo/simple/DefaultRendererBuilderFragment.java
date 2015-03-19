@@ -15,10 +15,14 @@
  */
 package com.mediacodec.demo.simple;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 import com.google.android.exoplayer.FrameworkSampleSource;
 import com.google.android.exoplayer.FFSampleSource;
 import com.google.android.exoplayer.MediaCodecAudioTrackRenderer;
 import com.google.android.exoplayer.MediaCodecVideoTrackRenderer;
+import com.google.android.exoplayer.SampleSource;
 import com.mediacodec.demo.simple.SimplePlayerActivity.RendererBuilder;
 import com.mediacodec.demo.simple.SimplePlayerActivity.RendererBuilderCallback;
 import com.mediacodec.demo.simple.SimplePlayerFragment.RendererBuilderCallbackFragment;
@@ -26,6 +30,7 @@ import com.mediacodec.demo.simple.SimplePlayerFragment.RendererBuilderFragment;
 
 import android.media.MediaCodec;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * A {@link RendererBuilder} for streams that can be read using
@@ -38,6 +43,7 @@ class DefaultRendererBuilderFragment implements RendererBuilderFragment
 //    private final SimplePlayerActivity playerActivity;
     private final SimplePlayerFragment playerFragment;
     private final Uri uri;
+    private static final String LOG_TAG = "DefaultRendererBuilderFragment";
 
 //    public DefaultRendererBuilderFragment(SimplePlayerActivity playerActivity, Uri uri)
 //    {
@@ -54,8 +60,55 @@ class DefaultRendererBuilderFragment implements RendererBuilderFragment
     public void buildRenderers(RendererBuilderCallbackFragment callback)
     {
         // Build the video and audio renderers.
-        //FFSampleSource sampleSource2 = new FFSampleSource(playerFragment, uri, null, 2);
-        FrameworkSampleSource sampleSource = new FrameworkSampleSource(playerFragment.getActivity(), uri, null, 2);
+        Class clazz = null;
+        try
+        {
+            clazz = Class.forName("android.os.SystemProperties");
+        }
+        catch (ClassNotFoundException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        Method method = null;
+        try
+        {
+            method = clazz.getDeclaredMethod("get", String.class);
+        }
+        catch (NoSuchMethodException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        String prop = "framework";
+        try
+        {
+            prop = (String) method.invoke(null, "media.omx.demuxer");
+        }
+        catch (IllegalArgumentException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (IllegalAccessException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        catch (InvocationTargetException e1)
+        {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        SampleSource  sampleSource=null;
+        Log.d(LOG_TAG, "media.omx.demuxer="+prop);
+
+        if (prop.equals("ffmpeg"))
+            sampleSource = new FFSampleSource(playerFragment.getActivity(), uri, null, 2);
+        else
+            sampleSource  = new FrameworkSampleSource(playerFragment.getActivity(), uri, null, 2);
+
+        //FrameworkSampleSource sampleSource = new FrameworkSampleSource(playerFragment.getActivity(), uri, null, 2);
         MediaCodecVideoTrackRenderer videoRenderer = new MediaCodecVideoTrackRenderer(sampleSource, MediaCodec.VIDEO_SCALING_MODE_SCALE_TO_FIT, 0, playerFragment.getMainHandler(), playerFragment, 50);
         MediaCodecAudioTrackRenderer audioRenderer = new MediaCodecAudioTrackRenderer(sampleSource);
 

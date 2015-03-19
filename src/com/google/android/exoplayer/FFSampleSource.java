@@ -22,6 +22,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.media.MediaExtractor;
 import android.net.Uri;
+import android.util.Log;
 
 import java.io.IOException;
 import java.util.Map;
@@ -54,9 +55,11 @@ public final class FFSampleSource implements SampleSource
     private boolean[] pendingDiscontinuities;
 
     private long seekTimeUs;
+    private static final String LOG_TAG = "FFSampleSource";
 
     public FFSampleSource(Context context, Uri uri, Map<String, String> headers, int downstreamRendererCount)
     {
+        Log.d(LOG_TAG, "FFSampleSource Ctor");
         Assertions.checkState(Util.SDK_INT >= 16);
         this.context = context;
         this.uri = uri;
@@ -126,6 +129,7 @@ public final class FFSampleSource implements SampleSource
     @Override
     public int readData(int track, long playbackPositionUs, FormatHolder formatHolder, SampleHolder sampleHolder, boolean onlyReadDiscontinuity)
     {
+        Log.d(LOG_TAG, "FFSampleSource::readData");
         Assertions.checkState(prepared);
         Assertions.checkState(trackStates[track] != TRACK_STATE_DISABLED);
         if (pendingDiscontinuities[track])

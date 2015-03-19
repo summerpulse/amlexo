@@ -14,12 +14,14 @@ import android.media.MediaCodec;
 import android.media.MediaFormat;
 import android.media.MediaExtractor;
 import android.net.Uri;
+import android.util.Log;
 
 public class FFExtractor
 {
-
+    private static final String LOG_TAG = "FFExtractor";
     public FFExtractor()
     {
+        Log.d(LOG_TAG,"FFExtractor Ctor");
         // TODO Auto-generated constructor stub
         native_setup();
     }
@@ -62,6 +64,7 @@ public class FFExtractor
 
     public int getSampleTrackIndex()
     {
+        Log.d(LOG_TAG, "FFExtractor::getSampleTrackIndex");
         // TODO Auto-generated method stub
         return getSampleTrackIndex_native();
     }

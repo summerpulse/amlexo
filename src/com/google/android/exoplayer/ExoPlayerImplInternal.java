@@ -82,6 +82,7 @@ import java.util.List;
     private volatile long durationUs;
     private volatile long positionUs;
     private volatile long bufferedPositionUs;
+    private static final String LOG_TAG  = "ExoPlayerImplInternal";
 
     @SuppressLint("HandlerLeak")
     public ExoPlayerImplInternal(Handler eventHandler, boolean playWhenReady, boolean[] rendererEnabledFlags, int minBufferMs, int minRebufferMs)
@@ -209,6 +210,7 @@ import java.util.List;
     @Override
     public boolean handleMessage(Message msg)
     {
+        Log.d(LOG_TAG, "ExoPlayerImplInternal::handleMessage");
         try
         {
             switch (msg.what)
@@ -461,6 +463,7 @@ import java.util.List;
 
     private void doSomeWork() throws ExoPlaybackException
     {
+        Log.d(LOG_TAG, "ExoPlayerImplInternal::doSomeWork()");
         TraceUtil.beginSection("doSomeWork");
         long operationStartTimeMs = SystemClock.elapsedRealtime();
         long bufferedPositionUs = durationUs != TrackRenderer.UNKNOWN_TIME_US ? durationUs : Long.MAX_VALUE;

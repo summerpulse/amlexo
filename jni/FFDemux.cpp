@@ -9,7 +9,7 @@
 #include "FFDemux.h"
 #include "mediainfo_def.h"
 #include "PTSPopulator.h"
-#include "utils/log2.h"
+#include <utils/log2.h>
 #include "formats/AVCFormat.h"
 
 #include <stdint.h>
@@ -340,6 +340,7 @@ status_t FFDemux::unselectTrack(size_t index)
 
 status_t FFDemux::seekTo(int64_t timeUs, int mode)
 {
+	LOGW("FFDemux::seekTo");
     int seekFlag = 0;
     switch (mode) {
         case SEEK_TO_PREVIOUS_SYNC:
@@ -389,6 +390,7 @@ int64_t FFDemux::convertStreamTimeToUs(AVStream *st, int64_t timeInStreamTime)
 
 status_t FFDemux::advance()
 {
+	LOGW("FFDemux::advance");
     int i;
     int ret = 0;
     int search_end = 0;
@@ -399,25 +401,37 @@ status_t FFDemux::advance()
     	mStatus = av_read_frame(mFormatContext, packet);
         if (mStatus < 0 || avio_feof(mFormatContext->pb)) {
         	currentTrack = -1;
-        	LOGE("[ERROR]av_read_frame:%s.\n", av_err2str(mStatus));
+        	LOGE("Opps...[ERROR]av_read_frame:%s.\n", av_err2str(mStatus));
         	delete packet;
             return mStatus;
         }
         if (packet->size == 0) {
+        	LOGW("packet.size==0");
         	av_free_packet(packet);
         	continue;
         }
 
-        if (packet->stream_index == videoStreamIndex) {
+        if (packet->stream_index == videoStreamIndex)
+        {
+        	LOGW("got one video packet");
         	av_dup_packet(packet);
         	mTracks[videoIndex].mPacketQueue.push_back(packet);
-        } else if(packet->stream_index == audioStreamIndex) {
+        }
+        else if(packet->stream_index == audioStreamIndex)
+        {
+        	LOGW( "got one audio packet");
         	av_dup_packet(packet);
         	mTracks[audioIndex].mPacketQueue.push_back(packet);
-        } else if(packet->stream_index == subtitleStreamIndex) {
+        }
+        else if(packet->stream_index == subtitleStreamIndex)
+        {
+        	LOGW("got one subtitle packet");
         	av_dup_packet(packet);
         	mTracks[subtitleIndex].mPacketQueue.push_back(packet);
-        } else {
+        }
+        else
+        {
+        	LOGW("what the hell is this");
         	av_free_packet(packet);
         	continue;
         }
@@ -528,8 +542,13 @@ status_t FFDemux::readSampleData(char* buf, size_t& len, int offset)
 
 status_t FFDemux::getSampleTrackIndex(size_t *trackIndex)
 {
+	LOGW("FFDemux::getSampleTrackIndex(size_t *trackIndex)");
+	LOGW("%s, line:%d, currentTrack=%d", __FUNCTION__, __LINE__, currentTrack);
 	while (currentTrack < 0)
+	{
+		LOGW("%s, line:%d, currentTrack=%d", __FUNCTION__, __LINE__, currentTrack);
 		advance();
+	}
     *trackIndex = currentTrack;
     return 0;
 }

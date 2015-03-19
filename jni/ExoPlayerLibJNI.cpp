@@ -277,6 +277,7 @@ void JFfmpegExtractor::seekTo (jlong timeUs, jint mode)
 
 jboolean JFfmpegExtractor::advance ()
 {
+	ALOGW("JFfmpegExtractor::advance ()");
     if (mImpl)
         return mImpl->advance();
     else
@@ -341,6 +342,7 @@ jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset
 
 int JFfmpegExtractor::getSampleTrackIndex ()
 {
+	ALOGW("%s, %d", __FUNCTION__, __LINE__);
     size_t trackIndex = -1;
     if (mImpl)
         mImpl->getSampleTrackIndex(&trackIndex);
@@ -514,6 +516,7 @@ static void FFmpegExtractor_seekTo (JNIEnv *env, jobject object, jlong timeUs, j
 
 static jboolean FFmpegExtractor_advance (JNIEnv *env, jobject object)
 {
+	ALOGW("FFmpegExtractor_advance");
     bool ret = false;
     JFfmpegExtractor* extractor = getMediaExtractor(env, object);
     if (extractor == NULL) {
@@ -550,6 +553,7 @@ static jint FFmpegExtractor_readSampleData (JNIEnv *env, jobject object,
 
 static jint FFmpegExtractor_getSampleTrackIndex (JNIEnv *env, jobject object)
 {
+	ALOGW("%s, %d", __FUNCTION__, __LINE__);
     int ret = -1;
     JFfmpegExtractor* extractor = getMediaExtractor(env, object);
     if (extractor == NULL) {
@@ -616,6 +620,7 @@ static void FFmpegExtractor_native_init (JNIEnv *env, jobject object)
 
 static void FFmpegExtractor_native_setup (JNIEnv *env, jobject object)
 {
+	ALOGD("%s, %d", __FUNCTION__, __LINE__);
     JFfmpegExtractor* ffdemux = new JFfmpegExtractor(env, object);
     setMediaExtractor(env, object, ffdemux);
 }
