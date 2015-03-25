@@ -5,19 +5,19 @@
  *      Author: amlogic
  */
 
+#define LOG_TAG __FILE__
 #include <FFIO.h>
+//#include "utils/log2.h"
+#include <log/log.h>
 
 extern "C" {
 #include <libavcodec/avcodec.h>
 #include <libavformat/avio.h>
 }
 
-#include "utils/log2.h"
-#define TAG "FFIO"
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
-
+//#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
+//#define ALOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
+//#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
 
 static uint32_t kAdapterBufferSize = 32768;
 
@@ -29,7 +29,6 @@ FFIO::FFIO()
       mNextReadPos(0),
       mSource(NULL)
 {
-    
 }
 
 FFIO::~FFIO()
@@ -43,13 +42,13 @@ FFIO::~FFIO()
 bool FFIO::init(DataSource* src)
 {
     if (NULL == src) {
-        LOGE("Input source should not be NULL.");
+        ALOGE("Input source should not be NULL.");
         return false;
     }
 
     // Already inited?  If so, this is an error.
     if (mInitCheck) {
-        LOGW("Adapter is already initialized.");
+        ALOGW("Adapter is already initialized.");
         return false;
     }
 
@@ -70,10 +69,10 @@ bool FFIO::init(DataSource* src)
             mSource = src;
             mInitCheck = true;
         } else {
-            LOGE("Failed to initialize AVIOContext.");
+            ALOGE("Failed to initialize AVIOContext.");
         }
     } else {
-        LOGE("Failed to allocate %u bytes for ByteIOAdapter.", targetSize);
+        ALOGE("Failed to allocate %u bytes for ByteIOAdapter.", targetSize);
     }
 
     if (!mInitCheck) {
@@ -96,7 +95,7 @@ int32_t FFIO::read(uint8_t* buf, int read_size)
     }
 
     if (NULL == mSource) {
-        LOGE("mSource == NULL?\n");
+        ALOGE("mSource == NULL?\n");
         return -1;
     }
 
@@ -136,11 +135,12 @@ int64_t FFIO::seek(int64_t offset, int whence)
     case AVSEEK_SIZE:
         return size;
     default:
-        LOGE("Invalid seek whence (%d) in ByteIOAdapter::Seek", whence);
+        ALOGE("Invalid seek whence (%d) in ByteIOAdapter::Seek", whence);
+        break;
     }
 
     if ((target < 0) || (target > size)) {
-        LOGW("Invalid seek request to %lld (size: %lld).", target, size);
+        ALOGW("Invalid seek request to %lld (size: %lld).", target, size);
         return -1;
     }
 
@@ -152,7 +152,7 @@ int64_t FFIO::seek(int64_t offset, int whence)
 int32_t FFIO::staticRead(void* thiz, uint8_t* buf, int read_size)
 {
     if (thiz == NULL) {
-        LOGE("thiz == NULL?\n");
+        ALOGE("thiz == NULL?\n");
         return -1;
     }
     return static_cast<FFIO *>(thiz)->read(buf, read_size);
@@ -160,14 +160,14 @@ int32_t FFIO::staticRead(void* thiz, uint8_t* buf, int read_size)
 
 int32_t FFIO::staticWrite(void* thiz, uint8_t* buf, int write_size)
 {
-    LOGE("Why do you want to write?");
+    ALOGE("Why do you want to write?");
     return -1;
 }
 
 int64_t FFIO::staticSeek(void* thiz, int64_t offset, int whence)
 {
     if (thiz == NULL) {
-        LOGE("thiz == NULL?");
+        ALOGE("thiz == NULL?");
         return -1;
     }
     return static_cast<FFIO *>(thiz)->seek(offset, whence);

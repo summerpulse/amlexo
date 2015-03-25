@@ -1,9 +1,10 @@
+#define LOG_TAG __FILE__
 #include <assert.h>
 #include <jni.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <string.h>
-#include <utils/log2.h>
+#include<log/log.h>
 
 #include <media/stagefright/foundation/ADebug.h>
 #include <media/stagefright/MediaErrors.h>
@@ -24,19 +25,19 @@ class JavaDataSourceBridge : public DataSource {
 
         jclass datasourceclass = env->GetObjectClass(mDataSource);
         if (datasourceclass == NULL)
-            LOGE("datasourceclass == NULL\n");
+            ALOGE("datasourceclass == NULL\n");
 
         mReadMethod = env->GetMethodID(datasourceclass, "readAt", "(J[BI)I");
         if (mReadMethod != NULL)
-            LOGE("mReadMethod == NULL\n");
+            ALOGE("mReadMethod == NULL\n");
 
         mGetSizeMethod = env->GetMethodID(datasourceclass, "getSize", "()J");
         if (mGetSizeMethod != NULL)
-            LOGE("mGetSizeMethod == NULL\n");
+            ALOGE("mGetSizeMethod == NULL\n");
 
         mCloseMethod = env->GetMethodID(datasourceclass, "close", "()V");
         if (mCloseMethod != NULL)
-            LOGE("mCloseMethod == NULL\n");
+            ALOGE("mCloseMethod == NULL\n");
         mEnv = env;
     }
 
@@ -58,7 +59,7 @@ class JavaDataSourceBridge : public DataSource {
         mEnv->GetByteArrayRegion(byteArrayObj, 0, size, (jbyte*) buffer);
         mEnv->DeleteLocalRef(byteArrayObj);
         if (mEnv->ExceptionCheck()) {
-            LOGW("Exception occurred while reading %d at %lld", size, offset);
+            ALOGW("Exception occurred while reading %d at %lld", size, offset);
             mEnv->ExceptionClear();
             return -1;
         }
@@ -235,7 +236,7 @@ status_t JFfmpegExtractor::getTrackFormat (JNIEnv *env, jint index, jobject* for
         SetPropID = env->GetMethodID(MediaFormatClazz,
                     "setByteBuffer", "(Ljava/lang/String;Ljava/nio/ByteBuffer;)V");
         if (SetPropID && pinfo->mExtraData) {
-        	LOGE(" pass csd \n");
+        	ALOGE(" pass csd \n");
 			name = env->NewStringUTF("csd-0");
 			val = makeByteBufferObject(env, pinfo->mExtraData,
 					pinfo->mExtraSize);
@@ -286,13 +287,15 @@ jboolean JFfmpegExtractor::advance ()
 
 jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset,  size_t *sampleSize)
 {
+	ALOGW("%s, %s, %d", __FILE__, __FUNCTION__, __LINE__);
     status_t err;
     void *dst = env->GetDirectBufferAddress(byteBuf);
     jlong dstSize;
     jbyteArray byteArray = NULL;
     size_t size = 0;
 
-    if (dst == NULL) {
+    if (dst == NULL)
+    {
         jclass byteBufClass = env->FindClass("java/nio/ByteBuffer");
         CHECK(byteBufClass != NULL);
 
@@ -311,12 +314,16 @@ jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset
         dst = env->GetByteArrayElements(byteArray, &isCopy);
 
         dstSize = env->GetArrayLength(byteArray);
-    } else {
+    }
+    else
+    {
         dstSize = env->GetDirectBufferCapacity(byteBuf);
     }
 
-    if (dstSize < offset) {
-        if (byteArray != NULL) {
+    if (dstSize < offset)
+    {
+        if (byteArray != NULL)
+        {
             env->ReleaseByteArrayElements(byteArray, (jbyte *)dst, 0);
         }
 
@@ -327,13 +334,15 @@ jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset
 
     err = mImpl->readSampleData((char *)dst, size, offset);
 
-    if (byteArray != NULL) {
+    if (byteArray != NULL)
+    {
         env->ReleaseByteArrayElements(byteArray, (jbyte *)dst, 0);
     }
 
     *sampleSize = size;
 
-    if (err < 0) {
+    if (err < 0)
+    {
         return err;
     }
 
@@ -342,7 +351,7 @@ jint JFfmpegExtractor::readSampleData (JNIEnv *env, jobject byteBuf, jint offset
 
 int JFfmpegExtractor::getSampleTrackIndex ()
 {
-	ALOGW("%s, %d", __FUNCTION__, __LINE__);
+	ALOGW("%s, %s, %d", __FILE__, __FUNCTION__, __LINE__);
     size_t trackIndex = -1;
     if (mImpl)
         mImpl->getSampleTrackIndex(&trackIndex);
@@ -398,7 +407,7 @@ static void setMediaExtractor(
 
 static JFfmpegExtractor* getMediaExtractor(JNIEnv *env, jobject thiz) {
     if (gcontext == NULL) {
-        LOGE(" uninitialized class.\n");
+        ALOGE(" uninitialized class.\n");
         return NULL;
     } else
         return (JFfmpegExtractor *)env->GetIntField(thiz, gcontext);
@@ -530,6 +539,7 @@ static jboolean FFmpegExtractor_advance (JNIEnv *env, jobject object)
 static jint FFmpegExtractor_readSampleData (JNIEnv *env, jobject object,
         jobject byteBuf, jint offset)
 {
+	ALOGW("%s, %s, %d", __FILE__, __FUNCTION__, __LINE__);
     JFfmpegExtractor* extractor = getMediaExtractor(env, object);
     size_t sampleSize;
     status_t err;
@@ -553,12 +563,14 @@ static jint FFmpegExtractor_readSampleData (JNIEnv *env, jobject object,
 
 static jint FFmpegExtractor_getSampleTrackIndex (JNIEnv *env, jobject object)
 {
-	ALOGW("%s, %d", __FUNCTION__, __LINE__);
+	ALOGW("%s, %s, %d", __FILE__, __FUNCTION__, __LINE__);
     int ret = -1;
     JFfmpegExtractor* extractor = getMediaExtractor(env, object);
-    if (extractor == NULL) {
+    if (extractor == NULL)
+    {
         jniThrowException(env, "java/lang/IllegalStateException", NULL);
-    } else
+    }
+    else
         ret = extractor->getSampleTrackIndex();
     return ret;
 }
@@ -615,7 +627,7 @@ static void FFmpegExtractor_native_init (JNIEnv *env, jobject object)
 
     gcontext = env->GetFieldID(clazz, "mNativeContext", "I");
     if (gcontext == NULL)
-        LOGE(" fail to register class FFmpegExtractor...\n");
+        ALOGE(" fail to register class FFmpegExtractor...\n");
 }
 
 static void FFmpegExtractor_native_setup (JNIEnv *env, jobject object)
@@ -669,7 +681,7 @@ static JNINativeMethod gMethods[] = {
     { "native_finalize", "()V", (void *)FFmpegExtractor_native_finalize }
 };
 
-//LOGE("\t\t\t kasin __ %d __\n", __LINE__);
+//ALOGE("\t\t\t kasin __ %d __\n", __LINE__);
 jint JNI_OnLoad(JavaVM* vm, void* reserved)
 {
     JNIEnv* env = NULL;
@@ -678,12 +690,12 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
     jint jversion = JNI_VERSION_1_1;
 
     if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        LOGE("ERROR: GetEnv failed\n");
+        ALOGE("ERROR: GetEnv failed\n");
     } else {
         jversion = JNI_VERSION_1_4;
         clazz = env->FindClass("com/google/android/exoplayer/FFExtractor");
         if (clazz == NULL) {
-            LOGE("ERROR: FindClass com/google/android/exoplayer/FFExtractor.\n");
+            ALOGE("ERROR: FindClass com/google/android/exoplayer/FFExtractor.\n");
             return -1;
         }
         result = env->RegisterNatives(clazz,
@@ -691,7 +703,7 @@ jint JNI_OnLoad(JavaVM* vm, void* reserved)
     }
 
     if (result < 0)
-        LOGE("ERROR: Register Native Method fail.\n");
+        ALOGE("ERROR: Register Native Method fail.\n");
     return jversion;
 }
 
@@ -702,7 +714,7 @@ JNIEXPORT void JNICALL JNI_OnUnload(JavaVM* vm, void* reserved)
     jclass clazz = NULL;
 
     if (vm->GetEnv((void**) &env, JNI_VERSION_1_4) != JNI_OK) {
-        LOGE("ERROR: GetEnv failed\n");
+        ALOGE("ERROR: GetEnv failed\n");
     } else {
         clazz = env->FindClass("com/google/android/exoplayer/FFExtractor");
         if (clazz != NULL)

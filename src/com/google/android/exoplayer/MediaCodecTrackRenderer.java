@@ -186,6 +186,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
     @Override
     protected int doPrepare() throws ExoPlaybackException
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRender::doPrepare");
         try
         {
             boolean sourcePrepared = source.prepare();
@@ -225,6 +226,13 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
      */
     protected boolean handlesMimeType(String mimeType)
     {
+        Log.d(LOG_TAG, "handlesMimeTypes, MIME="+mimeType);
+        
+        if (mimeType.startsWith("video/"))
+        {
+        
+        }
+        
         return true;
         // TODO: Uncomment once the TODO above is fixed.
         // DecoderInfoUtil.getDecoder(mimeType) != null;
@@ -233,6 +241,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
     @Override
     protected void onEnabled(long timeUs, boolean joining)
     {
+        Log.d(LOG_TAG, "MediaCodecTrackRenderer::onEnabled");
         source.enable(trackIndex, timeUs);
         sourceIsReady = false;
         inputStreamEnded = false;
@@ -468,9 +477,11 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
                     {
                         while (drainOutputBuffer(timeUs))
                         {
+                            Log.d(LOG_TAG, "drainOutputBuffer");
                         }
                         while (feedInputBuffer())
                         {
+                            Log.d(LOG_TAG, "feedInputBuffer");
                         }
                     }
                 }
@@ -566,7 +577,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
      */
     private boolean feedInputBuffer() throws IOException, ExoPlaybackException
     {
-        Log.d(LOG_TAG, "MediaCodecTrackRenderer::feedInputBuffer");
+        Log.d(LOG_TAG, "feedInputBuffer");
         if (inputStreamEnded)
         {
             return false;
@@ -604,6 +615,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
                 }
                 codecReconfigurationState = RECONFIGURATION_STATE_QUEUE_PENDING;
             }
+            Log.d(LOG_TAG, String.format("trackIndex=%d, currentPositionUs=%d", trackIndex, currentPositionUs));
             result = source.readData(trackIndex, currentPositionUs, formatHolder, sampleHolder, false);
         }
 
@@ -836,6 +848,7 @@ public abstract class MediaCodecTrackRenderer extends TrackRenderer
      */
     private boolean drainOutputBuffer(long timeUs) throws ExoPlaybackException
     {
+        Log.d(LOG_TAG, this.getClass().getSimpleName()+"::drainOutputBuffer");
         if (outputStreamEnded)
         {
             return false;

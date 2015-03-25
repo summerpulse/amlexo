@@ -211,6 +211,7 @@ import java.util.List;
     public boolean handleMessage(Message msg)
     {
         Log.d(LOG_TAG, "ExoPlayerImplInternal::handleMessage");
+        Log.d(LOG_TAG, "msg="+msg);
         try
         {
             switch (msg.what)
@@ -470,15 +471,19 @@ import java.util.List;
         boolean isEnded = true;
         boolean allRenderersReadyOrEnded = true;
         updatePositionUs();
+        Log.d(LOG_TAG, "enabledRenderers.size()="+enabledRenderers.size());
         for (int i = 0; i < enabledRenderers.size(); i++)
         {
             TrackRenderer renderer = enabledRenderers.get(i);
+            Log.d(LOG_TAG, "renderer is: "+renderer.getClass().getSimpleName());
             // TODO: Each renderer should return the maximum delay before which
             // it wishes to be
             // invoked again. The minimum of these values should then be used as
             // the delay before the next
             // invocation of this method.
+            Log.d(LOG_TAG, "before renderer.doSomeWork(positionUs)");
             renderer.doSomeWork(positionUs);
+            Log.d(LOG_TAG, "after renderer.doSomeWork(positionUs)");
             isEnded = isEnded && renderer.isEnded();
             allRenderersReadyOrEnded = allRenderersReadyOrEnded && rendererReadyOrEnded(renderer);
 

@@ -4,9 +4,9 @@
  *  Created on: Sep 18, 2014
  *      Author: amlogic
  */
-
+#define LOG_TAG __FILE__
 #include <PTSPopulator.h>
-#include <utils/log2.h>
+#include <log/log.h>
 #include <stdint.h>
 
 namespace android {

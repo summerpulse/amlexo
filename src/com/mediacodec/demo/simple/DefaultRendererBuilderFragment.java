@@ -59,6 +59,7 @@ class DefaultRendererBuilderFragment implements RendererBuilderFragment
     @Override
     public void buildRenderers(RendererBuilderCallbackFragment callback)
     {
+        Log.d(LOG_TAG, "DefaultRendererBuilderFragment::buildRenderers");
         // Build the video and audio renderers.
         Class clazz = null;
         try
@@ -104,7 +105,10 @@ class DefaultRendererBuilderFragment implements RendererBuilderFragment
         Log.d(LOG_TAG, "media.omx.demuxer="+prop);
 
         if (prop.equals("ffmpeg"))
+        {
+            Log.d(LOG_TAG, "creating FFSampleSource");
             sampleSource = new FFSampleSource(playerFragment.getActivity(), uri, null, 2);
+        }
         else
             sampleSource  = new FrameworkSampleSource(playerFragment.getActivity(), uri, null, 2);
 

@@ -70,6 +70,7 @@ public final class FFSampleSource implements SampleSource
     @Override
     public boolean prepare() throws IOException
     {
+        Log.d(LOG_TAG, "FFSampleSource::prepare");
         if (!prepared)
         {
             extractor = new FFExtractor();
@@ -77,6 +78,7 @@ public final class FFSampleSource implements SampleSource
             trackStates = new int[extractor.getTrackCount()];
             pendingDiscontinuities = new boolean[trackStates.length];
             trackInfos = new TrackInfo[trackStates.length];
+
             for (int i = 0; i < trackStates.length; i++)
             {
                 android.media.MediaFormat format = extractor.getTrackFormat(i);
@@ -84,6 +86,7 @@ public final class FFSampleSource implements SampleSource
                 String mime = format.getString(android.media.MediaFormat.KEY_MIME);
                 trackInfos[i] = new TrackInfo(mime, duration);
             }
+
             prepared = true;
         }
         return true;
@@ -163,7 +166,10 @@ public final class FFSampleSource implements SampleSource
             }
             sampleHolder.timeUs = extractor.getSampleTime();
             sampleHolder.flags = extractor.getSampleFlags();
-
+//            if ((sampleHolder.flags & MediaExtractor.SAMPLE_FLAG_ENCRYPTED) != 0)
+//            {
+//                sampleHolder.cryptoInfo.setFromExtractorV16(extractor);
+//            }
             seekTimeUs = -1;
             extractor.advance();
             return SAMPLE_READ;

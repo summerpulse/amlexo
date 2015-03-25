@@ -4,12 +4,13 @@
  *  Created on: Sep 12, 2014
  *      Author: amlogic
  */
-
+#define LOG_TAG __FILE__
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <log/log.h>
 
 #include <FileSource.h>
 #include <assert.h>
@@ -21,11 +22,6 @@ extern "C" {
 #undef CodecType
 }
 
-#include <android/log.h>
-#define TAG "ExoPlayerLibJNI"
-#define LOGV(...) __android_log_print(ANDROID_LOG_VERBOSE, TAG, __VA_ARGS__)
-#define LOGE(...) __android_log_print(ANDROID_LOG_ERROR, TAG, __VA_ARGS__)
-#define LOGW(...) __android_log_print(ANDROID_LOG_WARN, TAG, __VA_ARGS__)
 
 namespace android {
 
@@ -39,7 +35,7 @@ FileSource::FileSource(const char *filename)
     if (mFd >= 0) {
         mLength = lseek64(mFd, 0, SEEK_END);
     } else {
-        LOGE("Failed to open file '%s'. (%s)", filename, strerror(errno));
+        ALOGE("Failed to open file '%s'. (%s)", filename, strerror(errno));
     }
 }
 
@@ -49,11 +45,11 @@ FileSource::FileSource(int fd, int64_t offset, int64_t length)
         mLength(length)
 {
     if (mOffset <= 0)
-        LOGE(" invalid offset:%lld\n", mOffset);
+        ALOGE(" invalid offset:%lld\n", mOffset);
     if (length <= 0)
-        LOGE(" invalid length:%lld\n", length);
+        ALOGE(" invalid length:%lld\n", length);
     if (length < mOffset)
-        LOGE(" length should greater than offset.\n");
+        ALOGE(" length should greater than offset.\n");
 }
 
 FileSource::~FileSource()
@@ -89,7 +85,7 @@ ssize_t FileSource::readAt(off64_t offset, void *data, size_t size)
 
     off64_t result = lseek64(mFd, offset + mOffset, SEEK_SET);
     if (result == -1) {
-        LOGE("seek to %lld failed", offset + mOffset);
+        ALOGE("seek to %lld failed", offset + mOffset);
         return UNKNOWN_ERROR;
     }
 
