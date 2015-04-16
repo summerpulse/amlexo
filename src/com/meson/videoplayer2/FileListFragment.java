@@ -12,12 +12,9 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.mediacodec.demo.DemoUtil;
-import com.meson.videoplayer2.R;
-
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
-import android.app.ListActivity;
 import android.app.ListFragment;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -35,19 +32,18 @@ import android.provider.MediaStore;
 import android.provider.MediaStore.MediaColumns;
 import android.provider.MediaStore.Video.VideoColumns;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.mediacodec.demo.DemoUtil;
+import com.mediacodec.demo.simple.DecoderFragment;
 import com.mediacodec.demo.simple.SimplePlayerActivity;
 import com.mediacodec.demo.simple.SimplePlayerFragment;
 
@@ -858,7 +854,21 @@ public class FileListFragment extends ListFragment
 //                startActivity(intent);
                 FragmentManager fm = getFragmentManager();
                 FragmentTransaction transaction = fm.beginTransaction();
-                SimplePlayerFragment video_fragment = new SimplePlayerFragment();
+                
+                Fragment video_fragment = null;
+                
+                String prop = Util.getSysProperty("media.omx.player", "exo");
+                Log.d(LOG_TAG, "media.omx.player = "+prop);
+                if(prop.equals("exo"))
+                {
+                    Log.d(LOG_TAG, "PLAY video using exoplayer");
+                    video_fragment = new SimplePlayerFragment();    
+                }
+                else
+                {
+                    Log.d(LOG_TAG, "PLAY video using naked MediaCodec");
+                    video_fragment = new DecoderFragment();
+                }
                 video_fragment.setArguments(bundle);
                 Log.d(LOG_TAG, "listview.id="+l.getId());
                 Log.d(LOG_TAG, "view.id="+v.getId());
