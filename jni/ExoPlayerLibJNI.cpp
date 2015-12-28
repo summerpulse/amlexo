@@ -1,4 +1,4 @@
-#define LOG_TAG __FILE__
+#define LOG_TAG "ExoPlayerLibJNI"
 #include <assert.h>
 #include <jni.h>
 #include <pthread.h>
